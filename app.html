@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dost AI — Your friend in any situation</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=IBM+Plex+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f0e8;
+  --paper: #fdfaf4;
+  --dark: #1a1508;
+  --ink: #2d2510;
+  --accent: #c8922a;
+  --accent2: #8b4513;
+  --muted: #8a7d65;
+  --border: #d4c9a8;
+  --surface: #efe8d5;
+  --surface2: #e8dfc8;
+  --green: #2d5a27;
+  --green2: #3d7a35;
+  --amber: #b8760a;
+  --blue: #2a4a8a;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Lora', serif;
+  min-height: 100vh;
+}
+
+body::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+  pointer-events:none;
+  z-index:0;
+}
+
+.app { position:relative; z-index:1; display:flex; flex-direction:column; min-height:100vh; }
+
+header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:16px 28px;
+  background:rgba(253,250,244,0.92);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  position:sticky;
+  top:0;
+  z-index:100;
+}
+
+.logo {
+  font-family:'Playfair Display', serif;
+  font-size:26px;
+  font-weight:900;
+  color:var(--dark);
+  letter-spacing:-1px;
+}
+.logo span { color:var(--accent); }
+.logo-tagline {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:9px;
+  color:var(--muted);
+  letter-spacing:2px;
+  margin-top:2px;
+}
+
+.header-right { display:flex; align-items:center; gap:14px; }
+
+.lang-flags { display:flex; gap:5px; }
+.lang-flag { font-size:18px; opacity:0.55; cursor:default; transition:opacity 0.15s; }
+.lang-flag:hover { opacity:1; }
+
+.multilang-badge {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:9px;
+  letter-spacing:1.5px;
+  color:var(--green);
+  background:rgba(45,90,39,0.08);
+  border:1px solid rgba(45,90,39,0.2);
+  padding:5px 10px;
+  border-radius:20px;
+}
+
+.module-tabs {
+  display:flex;
+  gap:0;
+  border-bottom:2px solid var(--border);
+  background:var(--paper);
+  overflow-x:auto;
+  padding:0 28px;
+}
+.module-tabs::-webkit-scrollbar { display:none; }
+
+.tab {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:14px 22px;
+  border:none;
+  background:none;
+  color:var(--muted);
+  font-family:'Lora', serif;
+  font-size:14px;
+  font-weight:600;
+  cursor:pointer;
+  transition:all 0.2s;
+  white-space:nowrap;
+  border-bottom:3px solid transparent;
+  margin-bottom:-2px;
+}
+.tab:hover { color:var(--ink); }
+.tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+.tab.active.gt { color:var(--green); border-bottom-color:var(--green); }
+.tab.active.at { color:var(--amber); border-bottom-color:var(--amber); }
+.tab-icon { font-size:18px; }
+
+.content {
+  display:grid;
+  grid-template-columns:260px 1fr;
+  height:calc(100vh - 114px);
+}
+
+.sidebar {
+  background:var(--paper);
+  border-right:1px solid var(--border);
+  padding:20px 12px;
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+}
+.sidebar::-webkit-scrollbar { width:3px; }
+.sidebar::-webkit-scrollbar-thumb { background:var(--border); }
+
+.sidebar-label {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:9px;
+  letter-spacing:3px;
+  color:var(--muted);
+  padding:10px 12px 6px;
+}
+
+.side-btn {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  width:100%;
+  padding:10px 12px;
+  background:none;
+  border:none;
+  border-radius:8px;
+  color:var(--muted);
+  font-family:'Lora', serif;
+  font-size:13px;
+  cursor:pointer;
+  transition:all 0.15s;
+  text-align:left;
+}
+.side-btn:hover { background:var(--surface); color:var(--ink); }
+.side-btn.sa { background:var(--surface2); color:var(--accent2); font-weight:600; }
+.side-btn.sg { background:rgba(45,90,39,0.08); color:var(--green); font-weight:600; }
+.side-btn.sam { background:rgba(184,118,10,0.08); color:var(--amber); font-weight:600; }
+
+.chat-panel { display:flex; flex-direction:column; height:100%; }
+
+.chat-messages {
+  flex:1;
+  overflow-y:auto;
+  padding:28px;
+  display:flex;
+  flex-direction:column;
+  gap:22px;
+  background:var(--bg);
+}
+.chat-messages::-webkit-scrollbar { width:4px; }
+.chat-messages::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+
+/* Welcome */
+.welcome {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  padding:36px 24px;
+  gap:14px;
+  max-width:520px;
+  margin:0 auto;
+}
+.welcome-emoji { font-size:52px; line-height:1; }
+.welcome h2 {
+  font-family:'Playfair Display', serif;
+  font-size:24px;
+  font-weight:900;
+  color:var(--dark);
+  line-height:1.25;
+}
+.welcome p { font-size:14px; color:var(--muted); line-height:1.75; }
+
+.lang-notice {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 16px;
+  background:rgba(45,90,39,0.06);
+  border:1px solid rgba(45,90,39,0.18);
+  border-radius:8px;
+  font-size:12px;
+  color:var(--green);
+  font-family:'IBM Plex Mono', monospace;
+  letter-spacing:0.5px;
+  width:100%;
+  max-width:420px;
+}
+
+.quick-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  width:100%;
+  margin-top:4px;
+}
+.quick-card {
+  background:var(--paper);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:14px;
+  cursor:pointer;
+  transition:all 0.18s;
+  text-align:left;
+  font-family:'Lora', serif;
+}
+.quick-card:hover { border-color:var(--accent); transform:translateY(-2px); box-shadow:0 6px 20px rgba(200,146,42,0.12); }
+.quick-card.qg:hover { border-color:var(--green); box-shadow:0 6px 20px rgba(45,90,39,0.1); }
+.quick-card.qa:hover { border-color:var(--amber); box-shadow:0 6px 20px rgba(184,118,10,0.1); }
+.qc-icon { font-size:20px; margin-bottom:8px; }
+.qc-text { font-size:12px; color:var(--muted); line-height:1.5; }
+
+/* Messages */
+.msg { display:flex; gap:12px; animation:fadeUp 0.25s ease; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
+.msg.user { flex-direction:row-reverse; }
+
+.avatar {
+  width:36px; height:36px;
+  border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:18px; flex-shrink:0;
+  border:1px solid var(--border);
+}
+.msg.ai .avatar { background:var(--paper); }
+.msg.user .avatar { background:var(--accent); border-color:var(--accent); font-size:13px; font-family:'Playfair Display',serif; font-weight:900; color:#fff; }
+
+.bubble {
+  max-width:580px;
+  padding:16px 20px;
+  border-radius:14px;
+  font-size:14px;
+  line-height:1.75;
+}
+.msg.ai .bubble { background:var(--paper); border:1px solid var(--border); border-top-left-radius:3px; color:var(--ink); }
+.msg.user .bubble { background:var(--accent); color:#fff; border-top-right-radius:3px; }
+
+/* Image preview in user bubble */
+.msg.user .bubble img { max-width:220px; border-radius:8px; display:block; margin-bottom:8px; opacity:0.9; }
+
+.bubble h4 { font-family:'Playfair Display',serif; font-size:15px; font-weight:700; margin-bottom:10px; color:var(--dark); }
+.bubble ul { padding-left:18px; margin:8px 0; }
+.bubble li { margin-bottom:6px; }
+
+.step-row { display:flex; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); }
+.step-row:last-of-type { border-bottom:none; }
+.sn { font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:500; min-width:22px; margin-top:2px; color:var(--accent); }
+.sn.g { color:var(--green); }
+.sn.a { color:var(--amber); }
+
+.tag { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:5px; font-size:11px; font-family:'IBM Plex Mono',monospace; margin-top:8px; margin-right:5px; }
+.tag.dl { background:rgba(184,118,10,0.1); color:var(--amber); border:1px solid rgba(184,118,10,0.25); }
+.tag.inf { background:rgba(42,74,138,0.08); color:var(--blue); border:1px solid rgba(42,74,138,0.2); }
+.tag.ok { background:rgba(45,90,39,0.08); color:var(--green); border:1px solid rgba(45,90,39,0.2); }
+
+.doc-block {
+  background:rgba(45,90,39,0.04);
+  border:1px solid rgba(45,90,39,0.2);
+  border-radius:10px;
+  padding:16px; margin:12px 0;
+  font-size:13px; line-height:1.9;
+  white-space:pre-line; font-family:'Lora',serif;
+}
+
+.disclaimer {
+  margin-top:12px; padding:10px 14px;
+  background:rgba(138,125,101,0.07);
+  border-left:3px solid var(--muted);
+  border-radius:0 8px 8px 0;
+  font-size:12px; color:var(--muted); font-style:italic; line-height:1.6;
+}
+
+/* Typing */
+.typing { display:flex; gap:5px; align-items:center; padding:3px 0; }
+.td { width:7px; height:7px; border-radius:50%; background:var(--accent); animation:bounce 1.2s ease-in-out infinite; }
+.td:nth-child(2){animation-delay:0.2s;}
+.td:nth-child(3){animation-delay:0.4s;}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:0.3;}30%{transform:translateY(-7px);opacity:1;}}
+
+/* Input area */
+.input-area {
+  padding:12px 28px 18px;
+  border-top:1px solid var(--border);
+  background:var(--paper);
+}
+
+/* Image preview before sending */
+.img-preview-wrap {
+  display:none;
+  align-items:center;
+  gap:10px;
+  padding:8px 12px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:10px;
+  margin-bottom:8px;
+}
+.img-preview-wrap.visible { display:flex; }
+.img-preview-wrap img { height:52px; border-radius:6px; object-fit:cover; }
+.img-preview-info { flex:1; }
+.img-preview-name { font-size:12px; font-weight:600; color:var(--ink); }
+.img-preview-sub { font-size:11px; color:var(--muted); font-family:'IBM Plex Mono',monospace; }
+.img-remove {
+  background:none; border:none; cursor:pointer;
+  color:var(--muted); font-size:18px; line-height:1;
+  transition:color 0.15s;
+}
+.img-remove:hover { color:var(--accent2); }
+
+.input-row {
+  display:flex;
+  gap:8px;
+  align-items:flex-end;
+  background:var(--bg);
+  border:1.5px solid var(--border);
+  border-radius:12px;
+  padding:10px 12px;
+  transition:border-color 0.2s, box-shadow 0.2s;
+}
+.input-row:focus-within { border-color:var(--accent); box-shadow:0 0 0 3px rgba(200,146,42,0.08); }
+.input-row.fc:focus-within { border-color:var(--green); box-shadow:0 0 0 3px rgba(45,90,39,0.07); }
+.input-row.fa:focus-within { border-color:var(--amber); box-shadow:0 0 0 3px rgba(184,118,10,0.07); }
+
+.input-row textarea {
+  flex:1; background:none; border:none; outline:none;
+  font-family:'Lora',serif; font-size:14px; color:var(--ink);
+  resize:none; min-height:22px; max-height:110px; line-height:1.6;
+}
+.input-row textarea::placeholder { color:var(--muted); }
+
+.upload-btn {
+  background:none; border:none; cursor:pointer;
+  color:var(--muted); font-size:20px; line-height:1;
+  padding:6px; border-radius:7px;
+  transition:all 0.15s; flex-shrink:0;
+}
+.upload-btn:hover { background:var(--surface); color:var(--accent); }
+
+.send-btn {
+  background:var(--dark); color:var(--accent);
+  border:none; border-radius:8px;
+  width:36px; height:36px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; font-size:17px;
+  transition:all 0.15s; flex-shrink:0;
+}
+.send-btn:hover { background:var(--accent); color:#fff; }
+.send-btn:disabled { opacity:0.35; cursor:not-allowed; }
+.send-btn.g { background:var(--green); color:#fff; }
+.send-btn.g:hover { background:var(--green2); }
+.send-btn.a { background:var(--amber); color:#fff; }
+
+.input-hints {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-top:7px;
+  padding:0 2px;
+}
+.input-hint { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--muted); letter-spacing:0.5px; }
+.lang-hint { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--green); }
+
+@media(max-width:700px){
+  .content{grid-template-columns:1fr;}
+  .sidebar{display:none;}
+  .quick-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div>
+      <div class="logo">Dost<span>.</span>AI</div>
+      <div class="logo-tagline">YOUR FRIEND IN ANY SITUATION</div>
+    </div>
+    <div class="header-right">
+      <div class="multilang-badge">🌐 MULTILINGUAL</div>
+      <div class="lang-flags">
+        <span class="lang-flag" title="Kazakhstan">🇰🇿</span>
+        <span class="lang-flag" title="Uzbekistan">🇺🇿</span>
+        <span class="lang-flag" title="Russia">🇷🇺</span>
+        <span class="lang-flag" title="Turkey">🇹🇷</span>
+        <span class="lang-flag" title="Kyrgyzstan">🇰🇬</span>
+        <span class="lang-flag" title="Azerbaijan">🇦🇿</span>
+        <span class="lang-flag" title="English">🇬🇧</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="module-tabs">
+    <button class="tab active" data-mod="lex" onclick="switchModule('lex',this)">
+      <span class="tab-icon">⚖️</span> <span data-i="rights">Мои права / My Rights</span>
+    </button>
+    <button class="tab gt" data-mod="doc" onclick="switchModule('doc',this)">
+      <span class="tab-icon">📋</span> <span data-i="docs">Документы / Documents</span>
+    </button>
+    <button class="tab at" data-mod="pension" onclick="switchModule('pension',this)">
+      <span class="tab-icon">👴</span> <span data-i="pension">Пенсия / Pension & Benefits</span>
+    </button>
+  </div>
+
+  <div class="content">
+    <div class="sidebar" id="sidebar"></div>
+    <div class="chat-panel" id="chatPanel">
+      <div class="chat-messages" id="chatMessages"></div>
+      <div class="input-area">
+
+        <!-- Image preview -->
+        <div class="img-preview-wrap" id="imgPreview">
+          <img id="imgPreviewThumb" src="" alt="preview">
+          <div class="img-preview-info">
+            <div class="img-preview-name" id="imgPreviewName">document.jpg</div>
+            <div class="img-preview-sub" id="imgPreviewSub">📎 DOCUMENT ATTACHED · AI WILL READ IT</div>
+          </div>
+          <button class="img-remove" onclick="removeImage()" title="Remove">✕</button>
+        </div>
+
+        <div class="input-row" id="inputRow">
+          <button class="upload-btn" onclick="document.getElementById('fileInput').click()" title="Attach file: PDF, Word, Excel, PowerPoint, Image, TXT">📎</button>
+          <input type="file" id="fileInput" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt" style="display:none" onchange="handleFile(event)">
+          <textarea id="msgInput"
+            placeholder="Ask anything in any language... / Задайте вопрос на любом языке... / Herhangi bir dilde sorun..."
+            rows="1"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg();}"
+            oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+          <button class="send-btn" id="sendBtn" onclick="sendMsg()">↑</button>
+        </div>
+
+        <div class="input-hints">
+          <span class="input-hint">Enter — send · Shift+Enter — new line</span>
+          <span class="lang-hint">🌐 Any language · 📎 PDF · 📝 Word · 📊 Excel · 📑 PPT · 🖼️ Images</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const mods = {
+  lex: {
+    sendCls:'', inputCls:'', icon:'⚖️',
+    title:'My Rights / Мои права',
+    welcomeTitle:'Know Your Rights / Знайте свои права',
+    welcomeText:'Ask about your rights in any situation — fines, disputes, violations. Write in any language: English, Russian, Turkish, Uzbek...',
+    quick:[
+      {icon:'🚗', text:'Got a fine — how to appeal? / Штраф — как оспорить?', cls:''},
+      {icon:'💼', text:'Employer not paying salary / Работодатель не платит', cls:'qg'},
+      {icon:'🎓', text:'Need apostille for documents / Нужен апостиль', cls:'qa'},
+      {icon:'🏠', text:'Conflict with landlord / Конфликт с арендодателем', cls:''},
+    ],
+    topics:[
+      {icon:'🚗', label:'Fines / Штрафы', q:'Help me with a traffic fine'},
+      {icon:'💼', label:'Labor / Труд', q:'My employer is not paying my salary'},
+      {icon:'🛒', label:'Consumer rights / Потребитель', q:'I want to return a product'},
+      {icon:'🎓', label:'Documents / Документы', q:'I need an apostille for my diploma, what should I do?'},
+      {icon:'🏠', label:'Rental / Аренда', q:'I have a conflict with my landlord'},
+      {icon:'🏦', label:'Banking / Банк', q:'Problem with my bank'},
+    ],
+    saCls:'sa',
+    system:`You are Dost AI — a friendly legal rights assistant for people in Kazakhstan, Uzbekistan, Russia, Turkey and Central Asia.
+
+CRITICAL LANGUAGE RULE: Always respond in the SAME language the user writes in. If they write in English → respond in English. Russian → Russian. Turkish → Turkish. Uzbek → Uzbek. Mixed → use the dominant language.
+
+If the user uploads a document image, read it carefully and explain what it says and what they should do.
+
+Format responses with HTML:
+- <h4> for headings
+- <ul><li> for lists
+- Steps: <div class="step-row"><span class="sn">01</span><div>text</div></div>
+- Deadlines: <div class="tag dl">⏰ Deadline: X days</div>
+- Info: <div class="tag inf">ℹ️ text</div>
+- Always end with: <div class="disclaimer">This information is for educational purposes. For official legal actions, please consult a licensed lawyer.</div>`
+  },
+
+  doc: {
+    sendCls:'g', inputCls:'fc', icon:'📋',
+    title:'Documents / Документы',
+    welcomeTitle:"Let's Draft Your Document",
+    welcomeText:"I'll help you write any complaint, application or letter — ready to send. Upload a document photo and I'll explain it or help you respond.",
+    quick:[
+      {icon:'📝', text:'Write a complaint to a bank', cls:''},
+      {icon:'⚡', text:'Complaint about bad product / Претензия на товар', cls:'qg'},
+      {icon:'🎓', text:'Apostille & diploma recognition', cls:'qa'},
+      {icon:'✉️', text:'Letter to employer / Письмо работодателю', cls:''},
+    ],
+    topics:[
+      {icon:'🏦', label:'Bank complaint', q:'Help me write a complaint to a bank'},
+      {icon:'🛒', label:'Product complaint', q:'Help me write a complaint about a defective product'},
+      {icon:'🏢', label:'Government application', q:'Help me write an application to a government office'},
+      {icon:'🎓', label:'Apostille / Diploma', q:'Help me understand the apostille process for my diploma'},
+      {icon:'💼', label:'Letter to employer', q:'Help me write a letter to my employer'},
+      {icon:'⚖️', label:'Legal claim', q:'Help me draft a legal claim'},
+    ],
+    saCls:'sg',
+    system:`You are Dost AI — a document drafting assistant for everyday people in Kazakhstan, Uzbekistan, Russia and Turkey.
+
+CRITICAL LANGUAGE RULE: Always respond in the SAME language the user writes in. English → English. Russian → Russian. Turkish → Turkish. Uzbek → Uzbek.
+
+If the user uploads a document image, read it carefully, explain what it says in simple terms, and ask if they need help responding to it.
+
+First ask clarifying questions if needed, then provide a ready-to-use document.
+
+Format with HTML:
+- <h4> for headings
+- Ready document: <div class="doc-block">document text here</div>
+- Steps: <div class="step-row"><span class="sn g">01</span><div>text</div></div>
+- <div class="tag ok">✓ text</div>
+- End with: <div class="disclaimer">This template is for guidance only. For complex cases, please consult a lawyer.</div>`
+  },
+
+  pension: {
+    sendCls:'a', inputCls:'fa', icon:'👴',
+    title:'Pension & Benefits / Пенсия',
+    welcomeTitle:'Pension & Social Benefits',
+    welcomeText:"I'll explain your pension rights, benefits and allowances. Upload a document from the pension fund and I'll explain what it means.",
+    quick:[
+      {icon:'💰', text:'What pension am I entitled to?', cls:'qa'},
+      {icon:'🎁', text:'What benefits can I get? / Какие льготы?', cls:''},
+      {icon:'📅', text:'When can I retire? / Когда на пенсию?', cls:'qg'},
+      {icon:'🏥', text:'Medical benefits / Льготы на лечение', cls:''},
+    ],
+    topics:[
+      {icon:'💰', label:'Pension amount', q:'How is my pension calculated?'},
+      {icon:'📅', label:'Retirement age', q:'When can I retire?'},
+      {icon:'🎁', label:'Benefits / Льготы', q:'What benefits are available for pensioners?'},
+      {icon:'🏥', label:'Medical benefits', q:'What medical benefits am I entitled to?'},
+      {icon:'🚌', label:'Transport & utilities', q:'What transport and utility benefits exist for pensioners?'},
+      {icon:'📋', label:'Required documents', q:'What documents do I need to apply for pension?'},
+    ],
+    saCls:'sam',
+    system:`You are Dost AI — a kind and patient pension & social benefits assistant for people in Kazakhstan.
+
+CRITICAL LANGUAGE RULE: Always respond in the SAME language the user writes in. English → English. Russian → Russian. Turkish → Turkish. Uzbek → Uzbek.
+
+If the user uploads a document from the pension fund (ENPF or other), read it carefully and explain what it says in simple, friendly terms.
+
+Topics: ENPF, basic pension, labor pension, social benefits, retirement age, required documents.
+
+Format with HTML:
+- <h4> for headings
+- <ul><li> for lists
+- Steps: <div class="step-row"><span class="sn a">01</span><div>text</div></div>
+- Amounts: <div class="tag dl">💰 text</div>
+- <div class="tag ok">✓ text</div>
+- End with: <div class="disclaimer">Amounts and conditions may change. For accurate information, please contact ENPF or your local service center.</div>`
+  }
+};
+
+let cur = 'lex';
+let messages = [];
+let pendingImageBase64 = null;
+let pendingImageName = '';
+let pendingMediaType = 'image/jpeg';
+
+function switchModule(mod, tabEl) {
+  cur = mod;
+  messages = [];
+  pendingImageBase64 = null;
+  pendingTextContent = null;
+  document.getElementById('imgPreview').classList.remove('visible');
+
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  tabEl.classList.add('active');
+
+  const m = mods[mod];
+  document.getElementById('sendBtn').className = 'send-btn ' + m.sendCls;
+  document.getElementById('inputRow').className = 'input-row ' + m.inputCls;
+
+  renderSidebar();
+  renderWelcome();
+}
+
+function renderSidebar() {
+  const m = mods[cur];
+  const sb = document.getElementById('sidebar');
+  sb.innerHTML = `<div class="sidebar-label">QUICK TOPICS</div>`;
+  m.topics.forEach(t => {
+    const btn = document.createElement('button');
+    btn.className = 'side-btn';
+    btn.innerHTML = `<span>${t.icon}</span>${t.label}`;
+    btn.onclick = () => {
+      document.querySelectorAll('.side-btn').forEach(b => b.className='side-btn');
+      btn.classList.add(m.saCls);
+      document.getElementById('msgInput').value = t.q;
+      sendMsg();
+    };
+    sb.appendChild(btn);
+  });
+}
+
+function renderWelcome() {
+  const m = mods[cur];
+  document.getElementById('chatMessages').innerHTML = `
+    <div class="welcome">
+      <div class="welcome-emoji">${m.icon}</div>
+      <h2>${m.welcomeTitle}</h2>
+      <p>${m.welcomeText}</p>
+      <div class="lang-notice">
+        🌐 Write in any language — I'll respond in the same one
+      </div>
+      <div class="quick-grid">
+        ${m.quick.map(q=>`
+          <div class="quick-card ${q.cls}" onclick="askQuick('${q.text.replace(/'/g,"\\'")}')">
+            <div class="qc-icon">${q.icon}</div>
+            <div class="qc-text">${q.text}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function askQuick(text) {
+  document.getElementById('msgInput').value = text;
+  sendMsg();
+}
+
+// File type helpers
+const FILE_TYPES = {
+  image:   { exts: ['jpg','jpeg','png','gif','webp'], icon: '🖼️', label: 'IMAGE', mode: 'image' },
+  pdf:     { exts: ['pdf'],                           icon: '📄', label: 'PDF',   mode: 'pdf' },
+  word:    { exts: ['doc','docx'],                    icon: '📝', label: 'WORD',  mode: 'text' },
+  excel:   { exts: ['xls','xlsx'],                    icon: '📊', label: 'EXCEL', mode: 'text' },
+  ppt:     { exts: ['ppt','pptx'],                    icon: '📑', label: 'PPT',   mode: 'text' },
+  txt:     { exts: ['txt'],                           icon: '📃', label: 'TXT',   mode: 'text' },
+};
+
+function getFileType(filename) {
+  const ext = filename.split('.').pop().toLowerCase();
+  for (const [key, val] of Object.entries(FILE_TYPES)) {
+    if (val.exts.includes(ext)) return { key, ...val };
+  }
+  return { key:'unknown', icon:'📎', label:'FILE', mode:'text' };
+}
+
+let pendingTextContent = null; // for Word/Excel/TXT extracted text
+
+// File handling
+async function handleFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  e.target.value = '';
+
+  const ftype = getFileType(file.name);
+  pendingImageName = file.name;
+  pendingTextContent = null;
+  pendingImageBase64 = null;
+
+  const svgIcon = (icon) => `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="52" height="52"><rect width="52" height="52" rx="8" fill="%23c8922a" opacity="0.12"/><text x="50%" y="56%" dominant-baseline="middle" text-anchor="middle" font-size="28">' + icon + '</text></svg>')}`;
+
+  function showPreview(thumbSrc, sublabel) {
+    document.getElementById('imgPreviewThumb').src = thumbSrc;
+    document.getElementById('imgPreviewName').textContent = file.name;
+    document.getElementById('imgPreviewSub').textContent = `${ftype.icon} ${ftype.label} ATTACHED · AI WILL READ IT`;
+    document.getElementById('imgPreview').classList.add('visible');
+  }
+
+  if (ftype.mode === 'image') {
+    // Native image — send as base64 image
+    pendingMediaType = file.type || 'image/jpeg';
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const dataUrl = ev.target.result;
+      pendingImageBase64 = dataUrl.split(',')[1];
+      showPreview(dataUrl);
+    };
+    reader.readAsDataURL(file);
+
+  } else if (ftype.mode === 'pdf') {
+    // PDF — send as document
+    pendingMediaType = 'application/pdf';
+    const reader = new FileReader();
+    reader.onload = ev => {
+      pendingImageBase64 = ev.target.result.split(',')[1];
+      showPreview(svgIcon('📄'));
+    };
+    reader.readAsDataURL(file);
+
+  } else if (ftype.key === 'word') {
+    // Word — extract text with mammoth
+    const arrayBuf = await file.arrayBuffer();
+    try {
+      const result = await mammoth.extractRawText({ arrayBuffer: arrayBuf });
+      pendingTextContent = result.value.slice(0, 8000); // limit
+      pendingMediaType = 'text';
+      showPreview(svgIcon('📝'));
+    } catch(err) {
+      alert('Could not read Word file. Try saving as .docx');
+    }
+
+  } else if (ftype.key === 'excel') {
+    // Excel — extract with SheetJS
+    const arrayBuf = await file.arrayBuffer();
+    try {
+      const wb = XLSX.read(arrayBuf, { type: 'array' });
+      let text = '';
+      wb.SheetNames.forEach(name => {
+        const ws = wb.Sheets[name];
+        text += `[Sheet: ${name}]\n` + XLSX.utils.sheet_to_csv(ws) + '\n\n';
+      });
+      pendingTextContent = text.slice(0, 8000);
+      pendingMediaType = 'text';
+      showPreview(svgIcon('📊'));
+    } catch(err) {
+      alert('Could not read Excel file.');
+    }
+
+  } else if (ftype.key === 'ppt') {
+    // PowerPoint — extract text with SheetJS (basic)
+    const arrayBuf = await file.arrayBuffer();
+    try {
+      const wb = XLSX.read(arrayBuf, { type: 'array' });
+      let text = wb.SheetNames.map(n => XLSX.utils.sheet_to_csv(wb.Sheets[n])).join('\n');
+      pendingTextContent = ('[PowerPoint file: ' + file.name + ']\n' + text).slice(0, 8000);
+      pendingMediaType = 'text';
+      showPreview(svgIcon('📑'));
+    } catch(err) {
+      // Fallback: just send filename info
+      pendingTextContent = `[PowerPoint file attached: ${file.name}. Please note I could not fully parse this file, but the user wants help with it.]`;
+      pendingMediaType = 'text';
+      showPreview(svgIcon('📑'));
+    }
+
+  } else if (ftype.key === 'txt') {
+    const text = await file.text();
+    pendingTextContent = text.slice(0, 8000);
+    pendingMediaType = 'text';
+    showPreview(svgIcon('📃'));
+  }
+}
+
+function removeImage() {
+  pendingImageBase64 = null;
+  pendingImageName = '';
+  pendingMediaType = 'image/jpeg';
+  pendingTextContent = null;
+  document.getElementById('imgPreview').classList.remove('visible');
+  document.getElementById('imgPreviewThumb').src = '';
+}
+
+function addMsg(role, html, imgSrc) {
+  const chat = document.getElementById('chatMessages');
+  const w = chat.querySelector('.welcome');
+  if (w) w.remove();
+
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  const av = role==='ai' ? mods[cur].icon : 'D';
+  const imgHtml = (imgSrc && role==='user') ? `<img src="${imgSrc}" alt="document">` : '';
+  div.innerHTML = `<div class="avatar">${av}</div><div class="bubble">${imgHtml}${html}</div>`;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function addTyping() {
+  const chat = document.getElementById('chatMessages');
+  const w = chat.querySelector('.welcome');
+  if (w) w.remove();
+  const div = document.createElement('div');
+  div.className = 'msg ai';
+  div.id = 'typing-el';
+  div.innerHTML = `<div class="avatar">${mods[cur].icon}</div><div class="bubble"><div class="typing"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>`;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+async function sendMsg() {
+  const input = document.getElementById('msgInput');
+  const text = input.value.trim();
+  if (!text && !pendingImageBase64) return;
+
+  const isPDF = pendingMediaType === 'application/pdf';
+  const isImage = pendingImageBase64 && !isPDF;
+  const isTextFile = pendingTextContent !== null;
+  const hasFile = isPDF || isImage || isTextFile;
+
+  const imgSrc = isImage ? `data:${pendingMediaType};base64,` + pendingImageBase64 : null;
+
+  let fileLabel = '';
+  if (isPDF) fileLabel = '📄 PDF attached';
+  else if (isImage) fileLabel = '🖼️ Image attached';
+  else if (isTextFile) fileLabel = `📎 ${pendingImageName} attached`;
+
+  const displayText = text || (hasFile ? fileLabel + ' — please read and explain' : '');
+  if (!displayText) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+  document.getElementById('sendBtn').disabled = true;
+
+  addMsg('user', displayText, imgSrc);
+
+  // Build message content for API
+  let userContent;
+  if (isPDF && pendingImageBase64) {
+    userContent = [
+      { type:'document', source:{ type:'base64', media_type:'application/pdf', data:pendingImageBase64 } },
+      { type:'text', text: text || 'Please read this document carefully and explain what it says and what I should do.' }
+    ];
+  } else if (isImage) {
+    userContent = [
+      { type:'image', source:{ type:'base64', media_type: pendingMediaType, data:pendingImageBase64 } },
+      { type:'text', text: text || 'Please read this document carefully and explain what it says and what I should do.' }
+    ];
+  } else if (isTextFile) {
+    const filePrompt = text
+      ? `${text}\n\n[File: ${pendingImageName}]\n${pendingTextContent}`
+      : `Please read this file carefully and explain what it says and what I should do.\n\n[File: ${pendingImageName}]\n${pendingTextContent}`;
+    userContent = filePrompt;
+  } else {
+    userContent = text;
+  }
+
+  // For history: store text-only version (no base64 image to avoid breaking history)
+  const historyContent = text || 'I uploaded a document image for you to read and explain.';
+  messages.push({ role:'user', content: historyContent });
+
+  // Clear image
+  removeImage();
+  addTyping();
+
+  try {
+    // Build messages for THIS request: replace last user message with full content (image + text)
+    const requestMessages = [
+      ...messages.slice(0, -1),
+      { role:'user', content: userContent }
+    ];
+
+    const res = await fetch('/api/chat', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system: mods[cur].system,
+        messages: requestMessages
+      })
+    });
+
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    const reply = data.content?.[0]?.text || 'No response received.';
+
+    // Store assistant reply in history
+    messages.push({ role:'assistant', content: reply });
+
+    document.getElementById('typing-el')?.remove();
+    addMsg('ai', reply);
+
+  } catch(e) {
+    document.getElementById('typing-el')?.remove();
+    addMsg('ai',`<p style="color:var(--muted)">⚠️ Error: ${e.message || 'Connection failed'}. Please try again.</p>`);
+    // Remove failed user message from history
+    messages.pop();
+  }
+
+  document.getElementById('sendBtn').disabled = false;
+  input.focus();
+}
+
+renderSidebar();
+renderWelcome();
+</script>
+</body>
+</html>
