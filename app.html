@@ -2,7 +2,13 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Dost.AI">
+<meta name="theme-color" content="#f5f0e8">
+<meta name="description" content="Твой друг в любой ситуации — AI помощник по правам, документам и пенсии">
 <title>Dost AI — Your friend in any situation</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -395,10 +401,116 @@ header {
 .input-hint { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--muted); letter-spacing:0.5px; }
 .lang-hint { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--green); }
 
+/* ═══════════════════════════════
+   MOBILE — полная адаптация
+═══════════════════════════════ */
 @media(max-width:700px){
-  .content{grid-template-columns:1fr;}
-  .sidebar{display:none;}
-  .quick-grid{grid-template-columns:1fr;}
+
+  /* Header — компактный */
+  header {
+    padding: 10px 16px;
+  }
+  .logo { font-size: 22px; }
+  .logo-tagline { display: none; }
+  .multilang-badge { display: none; }
+  .lang-flags { gap: 3px; }
+  .lang-flag { font-size: 15px; }
+
+  /* Табы — горизонтальный скролл, крупнее */
+  .module-tabs { padding: 0 8px; }
+  .tab {
+    padding: 12px 14px;
+    font-size: 13px;
+    gap: 6px;
+  }
+  .tab-icon { font-size: 20px; }
+
+  /* Лейаут — убираем сайдбар */
+  .content {
+    grid-template-columns: 1fr;
+    height: calc(100vh - 108px);
+  }
+  .sidebar { display: none; }
+
+  /* Чат — полный экран */
+  .chat-messages {
+    padding: 16px 12px;
+    gap: 16px;
+  }
+
+  /* Welcome экран */
+  .welcome { padding: 24px 12px; }
+  .welcome-emoji { font-size: 44px; }
+  .welcome h2 { font-size: 20px; }
+  .welcome p { font-size: 13px; }
+  .quick-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .quick-card { padding: 14px 10px; }
+  .qc-icon { font-size: 24px; }
+  .qc-text { font-size: 12px; }
+
+  /* Сообщения */
+  .msg { gap: 8px; }
+  .avatar {
+    width: 30px;
+    height: 30px;
+    font-size: 14px;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+  .bubble {
+    font-size: 14px;
+    padding: 12px 14px;
+    max-width: calc(100vw - 80px);
+  }
+
+  /* Инпут — удобнее на телефоне */
+  .input-area { padding: 10px 12px 14px; }
+  .input-row { gap: 8px; border-radius: 14px; padding: 8px 8px 8px 14px; }
+  #msgInput {
+    font-size: 16px; /* предотвращает зум на iOS */
+    min-height: 22px;
+  }
+  .send-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+    border-radius: 10px;
+    flex-shrink: 0;
+  }
+  .upload-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  /* Подсказки внизу */
+  .input-hints { flex-direction: column; gap: 3px; }
+  .lang-hint { font-size: 10px; }
+
+  /* Превью файла */
+  .img-preview-box { padding: 8px 12px; border-radius: 10px; }
+  .img-preview-thumb { width: 36px; height: 36px; }
+  .img-preview-name { font-size: 11px; }
+
+  /* Теги в ответах AI */
+  .tag { font-size: 11px; padding: 4px 8px; }
+  .step-row { gap: 10px; }
+  .sn { width: 26px; height: 26px; font-size: 11px; }
+
+  /* Scroll to bottom удобнее */
+  .bubble h4 { font-size: 14px; }
+  .bubble ul { padding-left: 16px; }
+}
+
+/* Очень маленькие экраны */
+@media(max-width:380px){
+  .quick-grid { grid-template-columns: 1fr; }
+  .tab span:not(.tab-icon) { display: none; }
+  .tab { padding: 12px 16px; }
 }
 </style>
 </head>
