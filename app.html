@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Dost.AI">
 <meta name="theme-color" content="#f5f0e8">
-<meta name="description" content="Твой друг в любой ситуации — AI помощник по правам, документам и пенсии">
+<meta name="description" content="Твой друг в любой ситуации — AI помощник по правовым вопросам">
 <title>Dost AI — Your friend in any situation</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -51,11 +51,12 @@ body::before {
 
 .app { position:relative; z-index:1; display:flex; flex-direction:column; min-height:100vh; }
 
+/* ─── HEADER ─── */
 header {
   display:flex;
   align-items:center;
   justify-content:space-between;
-  padding:16px 28px;
+  padding:14px 28px;
   background:rgba(253,250,244,0.92);
   backdrop-filter:blur(12px);
   border-bottom:1px solid var(--border);
@@ -70,6 +71,7 @@ header {
   font-weight:900;
   color:var(--dark);
   letter-spacing:-1px;
+  text-decoration:none;
 }
 .logo span { color:var(--accent); }
 .logo-tagline {
@@ -80,23 +82,90 @@ header {
   margin-top:2px;
 }
 
-.header-right { display:flex; align-items:center; gap:14px; }
+.header-right { display:flex; align-items:center; gap:10px; }
 
-.lang-flags { display:flex; gap:5px; }
-.lang-flag { font-size:18px; opacity:0.55; cursor:default; transition:opacity 0.15s; }
-.lang-flag:hover { opacity:1; }
-
-.multilang-badge {
-  font-family:'IBM Plex Mono', monospace;
-  font-size:9px;
-  letter-spacing:1.5px;
-  color:var(--green);
-  background:rgba(45,90,39,0.08);
-  border:1px solid rgba(45,90,39,0.2);
-  padding:5px 10px;
-  border-radius:20px;
+/* Language dropdown button */
+.lang-selector {
+  position: relative;
 }
 
+.lang-btn-main {
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-family:'IBM Plex Mono', monospace;
+  font-size:11px;
+  letter-spacing:1px;
+  color:var(--ink);
+  background:var(--surface);
+  border:1px solid var(--border);
+  padding:7px 12px;
+  border-radius:8px;
+  cursor:pointer;
+  transition:all 0.15s;
+}
+.lang-btn-main:hover { border-color:var(--accent); color:var(--accent); }
+.lang-arrow { font-size:9px; opacity:0.6; }
+
+.lang-dropdown {
+  display:none;
+  position:absolute;
+  top:calc(100% + 6px);
+  right:0;
+  background:var(--paper);
+  border:1px solid var(--border);
+  border-radius:10px;
+  box-shadow:0 8px 24px rgba(26,21,8,0.12);
+  overflow:hidden;
+  min-width:160px;
+  z-index:200;
+}
+.lang-dropdown.open { display:block; }
+
+.lang-option {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 16px;
+  cursor:pointer;
+  font-family:'IBM Plex Mono', monospace;
+  font-size:12px;
+  color:var(--ink);
+  transition:background 0.12s;
+}
+.lang-option:hover { background:var(--surface); }
+.lang-option.active { background:rgba(200,146,42,0.08); color:var(--accent); font-weight:500; }
+
+/* Auth buttons */
+.btn-auth-outline {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:11px;
+  letter-spacing:1px;
+  padding:7px 16px;
+  border:1.5px solid var(--border);
+  border-radius:8px;
+  background:none;
+  color:var(--ink);
+  cursor:pointer;
+  transition:all 0.15s;
+}
+.btn-auth-outline:hover { border-color:var(--accent); color:var(--accent); }
+
+.btn-auth-primary {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:11px;
+  letter-spacing:1px;
+  padding:7px 16px;
+  border:none;
+  border-radius:8px;
+  background:var(--dark);
+  color:var(--accent);
+  cursor:pointer;
+  transition:all 0.15s;
+}
+.btn-auth-primary:hover { background:var(--accent); color:#fff; }
+
+/* ─── MODULE TABS ─── */
 .module-tabs {
   display:flex;
   gap:0;
@@ -128,57 +197,21 @@ header {
 .tab.active { color:var(--accent); border-bottom-color:var(--accent); }
 .tab.active.gt { color:var(--green); border-bottom-color:var(--green); }
 .tab.active.at { color:var(--amber); border-bottom-color:var(--amber); }
+
+/* History tab pushed to right */
+.tab-history { margin-left:auto; }
 .tab-icon { font-size:18px; }
 
+/* ─── LAYOUT ─── */
 .content {
-  display:grid;
-  grid-template-columns:260px 1fr;
-  height:calc(100vh - 114px);
-}
-
-.sidebar {
-  background:var(--paper);
-  border-right:1px solid var(--border);
-  padding:20px 12px;
-  overflow-y:auto;
   display:flex;
   flex-direction:column;
-  gap:3px;
+  height:calc(100vh - 111px);
 }
-.sidebar::-webkit-scrollbar { width:3px; }
-.sidebar::-webkit-scrollbar-thumb { background:var(--border); }
-
-.sidebar-label {
-  font-family:'IBM Plex Mono', monospace;
-  font-size:9px;
-  letter-spacing:3px;
-  color:var(--muted);
-  padding:10px 12px 6px;
-}
-
-.side-btn {
-  display:flex;
-  align-items:center;
-  gap:10px;
-  width:100%;
-  padding:10px 12px;
-  background:none;
-  border:none;
-  border-radius:8px;
-  color:var(--muted);
-  font-family:'Lora', serif;
-  font-size:13px;
-  cursor:pointer;
-  transition:all 0.15s;
-  text-align:left;
-}
-.side-btn:hover { background:var(--surface); color:var(--ink); }
-.side-btn.sa { background:var(--surface2); color:var(--accent2); font-weight:600; }
-.side-btn.sg { background:rgba(45,90,39,0.08); color:var(--green); font-weight:600; }
-.side-btn.sam { background:rgba(184,118,10,0.08); color:var(--amber); font-weight:600; }
 
 .chat-panel { display:flex; flex-direction:column; height:100%; }
 
+/* ─── CHAT MESSAGES ─── */
 .chat-messages {
   flex:1;
   overflow-y:auto;
@@ -191,7 +224,7 @@ header {
 .chat-messages::-webkit-scrollbar { width:4px; }
 .chat-messages::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
 
-/* Welcome */
+/* ─── WELCOME ─── */
 .welcome {
   display:flex;
   flex-direction:column;
@@ -199,7 +232,7 @@ header {
   text-align:center;
   padding:36px 24px;
   gap:14px;
-  max-width:520px;
+  max-width:540px;
   margin:0 auto;
 }
 .welcome-emoji { font-size:52px; line-height:1; }
@@ -212,20 +245,18 @@ header {
 }
 .welcome p { font-size:14px; color:var(--muted); line-height:1.75; }
 
-.lang-notice {
-  display:flex;
+.location-pill {
+  display:inline-flex;
   align-items:center;
-  gap:8px;
-  padding:10px 16px;
+  gap:6px;
   background:rgba(45,90,39,0.06);
   border:1px solid rgba(45,90,39,0.18);
-  border-radius:8px;
-  font-size:12px;
-  color:var(--green);
+  border-radius:20px;
+  padding:5px 14px;
   font-family:'IBM Plex Mono', monospace;
+  font-size:11px;
+  color:var(--green);
   letter-spacing:0.5px;
-  width:100%;
-  max-width:420px;
 }
 
 .quick-grid {
@@ -251,7 +282,7 @@ header {
 .qc-icon { font-size:20px; margin-bottom:8px; }
 .qc-text { font-size:12px; color:var(--muted); line-height:1.5; }
 
-/* Messages */
+/* ─── MESSAGES ─── */
 .msg { display:flex; gap:12px; animation:fadeUp 0.25s ease; }
 @keyframes fadeUp { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
 .msg.user { flex-direction:row-reverse; }
@@ -275,8 +306,6 @@ header {
 }
 .msg.ai .bubble { background:var(--paper); border:1px solid var(--border); border-top-left-radius:3px; color:var(--ink); }
 .msg.user .bubble { background:var(--accent); color:#fff; border-top-right-radius:3px; }
-
-/* Image preview in user bubble */
 .msg.user .bubble img { max-width:220px; border-radius:8px; display:block; margin-bottom:8px; opacity:0.9; }
 
 .bubble h4 { font-family:'Playfair Display',serif; font-size:15px; font-weight:700; margin-bottom:10px; color:var(--dark); }
@@ -293,6 +322,23 @@ header {
 .tag.dl { background:rgba(184,118,10,0.1); color:var(--amber); border:1px solid rgba(184,118,10,0.25); }
 .tag.inf { background:rgba(42,74,138,0.08); color:var(--blue); border:1px solid rgba(42,74,138,0.2); }
 .tag.ok { background:rgba(45,90,39,0.08); color:var(--green); border:1px solid rgba(45,90,39,0.2); }
+
+/* Law reference tag */
+.tag.law {
+  background:rgba(200,146,42,0.08);
+  color:var(--accent2);
+  border:1px solid rgba(200,146,42,0.25);
+  font-size:11px;
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:4px 10px;
+  border-radius:5px;
+  margin-top:8px;
+  margin-right:5px;
+  font-family:'IBM Plex Mono',monospace;
+}
+.tag.law a { color:inherit; text-decoration:underline; text-underline-offset:2px; }
 
 .doc-block {
   background:rgba(45,90,39,0.04);
@@ -311,21 +357,20 @@ header {
   font-size:12px; color:var(--muted); font-style:italic; line-height:1.6;
 }
 
-/* Typing */
+/* Typing indicator */
 .typing { display:flex; gap:5px; align-items:center; padding:3px 0; }
 .td { width:7px; height:7px; border-radius:50%; background:var(--accent); animation:bounce 1.2s ease-in-out infinite; }
 .td:nth-child(2){animation-delay:0.2s;}
 .td:nth-child(3){animation-delay:0.4s;}
 @keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:0.3;}30%{transform:translateY(-7px);opacity:1;}}
 
-/* Input area */
+/* ─── INPUT AREA ─── */
 .input-area {
   padding:12px 28px 18px;
   border-top:1px solid var(--border);
   background:var(--paper);
 }
 
-/* Image preview before sending */
 .img-preview-wrap {
   display:none;
   align-items:center;
@@ -399,176 +444,319 @@ header {
   padding:0 2px;
 }
 .input-hint { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--muted); letter-spacing:0.5px; }
-.lang-hint { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--green); }
+.disclaimer-hint { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--muted); font-style:italic; }
 
-/* ═══════════════════════════════
-   MOBILE — полная адаптация
-═══════════════════════════════ */
-@media(max-width:700px){
+/* ─── HISTORY PANEL ─── */
+.history-panel {
+  display:none;
+  position:fixed;
+  top:111px;
+  right:0;
+  width:300px;
+  height:calc(100vh - 111px);
+  background:var(--paper);
+  border-left:1px solid var(--border);
+  z-index:50;
+  flex-direction:column;
+  padding:16px;
+  overflow-y:auto;
+  box-shadow:-4px 0 16px rgba(26,21,8,0.08);
+}
+.history-panel.open { display:flex; }
+.history-title {
+  font-family:'IBM Plex Mono',monospace;
+  font-size:10px;
+  letter-spacing:3px;
+  color:var(--muted);
+  margin-bottom:16px;
+}
+.history-empty {
+  font-size:13px;
+  color:var(--muted);
+  text-align:center;
+  margin-top:32px;
+  line-height:1.7;
+}
+.history-login-prompt {
+  margin-top:16px;
+  padding:14px;
+  background:rgba(200,146,42,0.06);
+  border:1px solid rgba(200,146,42,0.2);
+  border-radius:10px;
+  font-size:12px;
+  color:var(--muted);
+  line-height:1.6;
+  text-align:center;
+}
+.history-login-prompt a {
+  color:var(--accent);
+  cursor:pointer;
+  text-decoration:underline;
+}
+.history-item {
+  padding:10px 12px;
+  border-radius:8px;
+  border:1px solid var(--border);
+  margin-bottom:8px;
+  cursor:pointer;
+  transition:all 0.15s;
+}
+.history-item:hover { border-color:var(--accent); background:var(--surface); }
+.history-item-title { font-size:13px; color:var(--ink); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.history-item-date { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--muted); margin-top:3px; }
 
-  /* Header — компактный */
-  header {
-    padding: 10px 16px;
-  }
-  .logo { font-size: 22px; }
-  .logo-tagline { display: none; }
-  .multilang-badge { display: none; }
-  .lang-flags { gap: 3px; }
-  .lang-flag { font-size: 15px; }
+/* ─── AUTH MODAL ─── */
+.modal-overlay {
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(26,21,8,0.5);
+  z-index:300;
+  align-items:center;
+  justify-content:center;
+  backdrop-filter:blur(4px);
+}
+.modal-overlay.open { display:flex; }
 
-  /* Табы — горизонтальный скролл, крупнее */
-  .module-tabs { padding: 0 8px; }
-  .tab {
-    padding: 12px 14px;
-    font-size: 13px;
-    gap: 6px;
-  }
-  .tab-icon { font-size: 20px; }
-
-  /* Лейаут — убираем сайдбар */
-  .content {
-    grid-template-columns: 1fr;
-    height: calc(100vh - 108px);
-  }
-  .sidebar { display: none; }
-
-  /* Чат — полный экран */
-  .chat-messages {
-    padding: 16px 12px;
-    gap: 16px;
-  }
-
-  /* Welcome экран */
-  .welcome { padding: 24px 12px; }
-  .welcome-emoji { font-size: 44px; }
-  .welcome h2 { font-size: 20px; }
-  .welcome p { font-size: 13px; }
-  .quick-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-  .quick-card { padding: 14px 10px; }
-  .qc-icon { font-size: 24px; }
-  .qc-text { font-size: 12px; }
-
-  /* Сообщения */
-  .msg { gap: 8px; }
-  .avatar {
-    width: 30px;
-    height: 30px;
-    font-size: 14px;
-    border-radius: 8px;
-    flex-shrink: 0;
-  }
-  .bubble {
-    font-size: 14px;
-    padding: 12px 14px;
-    max-width: calc(100vw - 80px);
-  }
-
-  /* Инпут — удобнее на телефоне */
-  .input-area { padding: 10px 12px 14px; }
-  .input-row { gap: 8px; border-radius: 14px; padding: 8px 8px 8px 14px; }
-  #msgInput {
-    font-size: 16px; /* предотвращает зум на iOS */
-    min-height: 22px;
-  }
-  .send-btn {
-    width: 40px;
-    height: 40px;
-    font-size: 18px;
-    border-radius: 10px;
-    flex-shrink: 0;
-  }
-  .upload-btn {
-    width: 40px;
-    height: 40px;
-    font-size: 18px;
-    flex-shrink: 0;
-  }
-
-  /* Подсказки внизу */
-  .input-hints { flex-direction: column; gap: 3px; }
-  .lang-hint { font-size: 10px; }
-
-  /* Превью файла */
-  .img-preview-box { padding: 8px 12px; border-radius: 10px; }
-  .img-preview-thumb { width: 36px; height: 36px; }
-  .img-preview-name { font-size: 11px; }
-
-  /* Теги в ответах AI */
-  .tag { font-size: 11px; padding: 4px 8px; }
-  .step-row { gap: 10px; }
-  .sn { width: 26px; height: 26px; font-size: 11px; }
-
-  /* Scroll to bottom удобнее */
-  .bubble h4 { font-size: 14px; }
-  .bubble ul { padding-left: 16px; }
+.modal {
+  background:var(--paper);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:36px;
+  width:100%;
+  max-width:400px;
+  box-shadow:0 24px 64px rgba(26,21,8,0.2);
+  position:relative;
 }
 
-/* Очень маленькие экраны */
+.modal-close {
+  position:absolute;
+  top:16px; right:16px;
+  background:none; border:none;
+  font-size:20px; color:var(--muted);
+  cursor:pointer; line-height:1;
+}
+.modal-close:hover { color:var(--ink); }
+
+.modal-logo {
+  font-family:'Playfair Display', serif;
+  font-size:22px;
+  font-weight:900;
+  color:var(--dark);
+  margin-bottom:4px;
+}
+.modal-logo span { color:var(--accent); }
+
+.modal-subtitle {
+  font-family:'IBM Plex Mono',monospace;
+  font-size:10px;
+  letter-spacing:2px;
+  color:var(--muted);
+  margin-bottom:24px;
+}
+
+.modal-tabs {
+  display:flex;
+  gap:0;
+  border-bottom:2px solid var(--border);
+  margin-bottom:24px;
+}
+.modal-tab {
+  flex:1;
+  padding:10px;
+  border:none;
+  background:none;
+  font-family:'Lora',serif;
+  font-size:14px;
+  font-weight:600;
+  color:var(--muted);
+  cursor:pointer;
+  border-bottom:2px solid transparent;
+  margin-bottom:-2px;
+  transition:all 0.15s;
+}
+.modal-tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+
+.modal-form { display:flex; flex-direction:column; gap:12px; }
+
+.form-input {
+  width:100%;
+  padding:12px 14px;
+  border:1.5px solid var(--border);
+  border-radius:10px;
+  background:var(--bg);
+  font-family:'Lora',serif;
+  font-size:14px;
+  color:var(--ink);
+  outline:none;
+  transition:border-color 0.2s;
+}
+.form-input:focus { border-color:var(--accent); }
+.form-input::placeholder { color:var(--muted); }
+
+.btn-google {
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding:12px;
+  border:1.5px solid var(--border);
+  border-radius:10px;
+  background:white;
+  font-family:'Lora',serif;
+  font-size:14px;
+  color:var(--ink);
+  cursor:pointer;
+  transition:all 0.15s;
+}
+.btn-google:hover { border-color:var(--accent); box-shadow:0 2px 8px rgba(0,0,0,0.08); }
+
+.divider {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:10px;
+  color:var(--muted);
+  letter-spacing:1px;
+}
+.divider::before, .divider::after {
+  content:'';
+  flex:1;
+  height:1px;
+  background:var(--border);
+}
+
+.btn-submit {
+  width:100%;
+  padding:13px;
+  border:none;
+  border-radius:10px;
+  background:var(--dark);
+  color:var(--accent);
+  font-family:'IBM Plex Mono',monospace;
+  font-size:12px;
+  letter-spacing:2px;
+  cursor:pointer;
+  transition:all 0.15s;
+}
+.btn-submit:hover { background:var(--accent); color:#fff; }
+
+/* ─── MOBILE ─── */
+@media(max-width:700px){
+  header { padding:10px 16px; }
+  .logo { font-size:22px; }
+  .logo-tagline { display:none; }
+  .module-tabs { padding:0 8px; }
+  .tab { padding:12px 14px; font-size:13px; gap:6px; }
+  .tab-icon { font-size:20px; }
+  .content { height:calc(100vh - 108px); }
+  .chat-messages { padding:16px 12px; gap:16px; }
+  .welcome { padding:24px 12px; }
+  .welcome-emoji { font-size:44px; }
+  .welcome h2 { font-size:20px; }
+  .welcome p { font-size:13px; }
+  .quick-grid { grid-template-columns:1fr 1fr; gap:8px; }
+  .quick-card { padding:14px 10px; }
+  .qc-icon { font-size:24px; }
+  .qc-text { font-size:12px; }
+  .msg { gap:8px; }
+  .avatar { width:30px; height:30px; font-size:14px; border-radius:8px; flex-shrink:0; }
+  .bubble { font-size:14px; padding:12px 14px; max-width:calc(100vw - 80px); }
+  .input-area { padding:10px 12px 14px; }
+  .input-row { gap:8px; border-radius:14px; padding:8px 8px 8px 14px; }
+  #msgInput { font-size:16px; min-height:22px; }
+  .send-btn { width:40px; height:40px; font-size:18px; border-radius:10px; flex-shrink:0; }
+  .upload-btn { width:40px; height:40px; font-size:18px; flex-shrink:0; }
+  .input-hints { flex-direction:column; gap:3px; }
+  .header-right { gap:6px; }
+  .btn-auth-outline { display:none; }
+  .history-panel { width:100%; top:108px; height:calc(100vh - 108px); }
+}
+
 @media(max-width:380px){
-  .quick-grid { grid-template-columns: 1fr; }
-  .tab span:not(.tab-icon) { display: none; }
-  .tab { padding: 12px 16px; }
+  .quick-grid { grid-template-columns:1fr; }
+  .tab span:not(.tab-icon) { display:none; }
+  .tab { padding:12px 16px; }
 }
 </style>
 </head>
 <body>
 <div class="app">
 
+  <!-- ─── HEADER ─── -->
   <header>
     <div>
-      <div class="logo">Dost<span>.</span>AI</div>
+      <a href="/" class="logo">Dost<span>.</span>AI</a>
       <div class="logo-tagline">YOUR FRIEND IN ANY SITUATION</div>
     </div>
     <div class="header-right">
-      <div class="multilang-badge">🌐 MULTILINGUAL</div>
-      <div class="lang-flags">
-        <span class="lang-flag" title="Kazakhstan">🇰🇿</span>
-        <span class="lang-flag" title="Uzbekistan">🇺🇿</span>
-        <span class="lang-flag" title="Russia">🇷🇺</span>
-        <span class="lang-flag" title="Turkey">🇹🇷</span>
-        <span class="lang-flag" title="Kyrgyzstan">🇰🇬</span>
-        <span class="lang-flag" title="Azerbaijan">🇦🇿</span>
-        <span class="lang-flag" title="English">🇬🇧</span>
+
+      <!-- Language selector -->
+      <div class="lang-selector" id="langSelector">
+        <button class="lang-btn-main" onclick="toggleLangDropdown()">
+          🌐 <span id="langLabel">RU</span> <span class="lang-arrow">▾</span>
+        </button>
+        <div class="lang-dropdown" id="langDropdown">
+          <div class="lang-option active" onclick="setUILang('ru','RU','Русский')">🇷🇺 Русский</div>
+          <div class="lang-option" onclick="setUILang('en','EN','English')">🇬🇧 English</div>
+          <div class="lang-option" onclick="setUILang('kz','ҚАЗ','Қазақша')">🇰🇿 Қазақша</div>
+          <div class="lang-option" onclick="setUILang('tr','TR','Türkçe')">🇹🇷 Türkçe</div>
+        </div>
       </div>
+
+      <button class="btn-auth-outline" onclick="openAuth('login')" id="loginBtn" data-i="login">Войти</button>
+      <button class="btn-auth-primary" onclick="openAuth('register')" id="registerBtn" data-i="register">Регистрация</button>
     </div>
   </header>
 
+  <!-- ─── MODULE TABS ─── -->
   <div class="module-tabs">
     <button class="tab active" data-mod="lex" onclick="switchModule('lex',this)">
-      <span class="tab-icon">⚖️</span> <span data-i="rights">Мои права / My Rights</span>
+      <span class="tab-icon">⚖️</span> <span data-i="tabRights">Мои права</span>
     </button>
     <button class="tab gt" data-mod="doc" onclick="switchModule('doc',this)">
-      <span class="tab-icon">📋</span> <span data-i="docs">Документы / Documents</span>
+      <span class="tab-icon">💼</span> <span data-i="tabLabor">Труд</span>
     </button>
-    <button class="tab at" data-mod="pension" onclick="switchModule('pension',this)">
-      <span class="tab-icon">👴</span> <span data-i="pension">Пенсия / Pension & Benefits</span>
+    <button class="tab" data-mod="rental" onclick="switchModule('rental',this)">
+      <span class="tab-icon">🏠</span> <span data-i="tabRental">Аренда</span>
+    </button>
+    <button class="tab" data-mod="fines" onclick="switchModule('fines',this)">
+      <span class="tab-icon">🚗</span> <span data-i="tabFines">Штрафы</span>
+    </button>
+    <button class="tab" data-mod="banking" onclick="switchModule('banking',this)">
+      <span class="tab-icon">🏦</span> <span data-i="tabBanking">Банки</span>
+    </button>
+    <button class="tab" data-mod="consumer" onclick="switchModule('consumer',this)">
+      <span class="tab-icon">👤</span> <span data-i="tabConsumer">Потребитель</span>
+    </button>
+    <button class="tab tab-history" onclick="toggleHistory()">
+      <span class="tab-icon">🕐</span> <span data-i="tabHistory">История</span>
     </button>
   </div>
 
+  <!-- ─── MAIN CONTENT ─── -->
   <div class="content">
-    <div class="sidebar" id="sidebar"></div>
     <div class="chat-panel" id="chatPanel">
       <div class="chat-messages" id="chatMessages"></div>
-      <div class="input-area">
 
-        <!-- Image preview -->
+      <div class="input-area">
+        <!-- File preview -->
         <div class="img-preview-wrap" id="imgPreview">
           <img id="imgPreviewThumb" src="" alt="preview">
           <div class="img-preview-info">
             <div class="img-preview-name" id="imgPreviewName">document.jpg</div>
-            <div class="img-preview-sub" id="imgPreviewSub">📎 DOCUMENT ATTACHED · AI WILL READ IT</div>
+            <div class="img-preview-sub" id="imgPreviewSub">📎 ДОКУМЕНТ ПРИКРЕПЛЁН</div>
           </div>
-          <button class="img-remove" onclick="removeImage()" title="Remove">✕</button>
+          <button class="img-remove" onclick="removeImage()" title="Удалить">✕</button>
         </div>
 
         <div class="input-row" id="inputRow">
-          <button class="upload-btn" onclick="document.getElementById('fileInput').click()" title="Attach file: PDF, Word, Excel, PowerPoint, Image, TXT">📎</button>
+          <button class="upload-btn" onclick="document.getElementById('fileInput').click()" title="Прикрепить файл">📎</button>
           <input type="file" id="fileInput" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt" style="display:none" onchange="handleFile(event)">
           <textarea id="msgInput"
-            placeholder="Ask anything in any language... / Задайте вопрос на любом языке... / Herhangi bir dilde sorun..."
+            placeholder="Задайте вопрос..."
             rows="1"
             onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg();}"
             oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
@@ -576,40 +764,217 @@ header {
         </div>
 
         <div class="input-hints">
-          <span class="input-hint">Enter — send · Shift+Enter — new line</span>
-          <span class="lang-hint">🌐 Any language · 📎 PDF · 📝 Word · 📊 Excel · 📑 PPT · 🖼️ Images</span>
+          <span class="input-hint">Enter — отправить · Shift+Enter — новая строка</span>
+          <span class="disclaimer-hint" data-i="disclaimer">⚠️ Дост не заменяет профессионального юриста</span>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- ─── HISTORY PANEL ─── -->
+  <div class="history-panel" id="historyPanel">
+    <div class="history-title" data-i="historyTitle">ИСТОРИЯ ЧАТОВ</div>
+    <div id="historyContent"></div>
+  </div>
+
+</div>
+
+<!-- ─── AUTH MODAL ─── -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeAuth()">✕</button>
+    <div class="modal-logo">Dost<span>.</span>AI</div>
+    <div class="modal-subtitle" data-i="modalSubtitle">СОХРАНЯЙТЕ ИСТОРИЮ ЧАТОВ</div>
+
+    <div class="modal-tabs">
+      <button class="modal-tab active" id="tabLogin" onclick="switchAuthTab('login')" data-i="login">Войти</button>
+      <button class="modal-tab" id="tabRegister" onclick="switchAuthTab('register')" data-i="register">Регистрация</button>
+    </div>
+
+    <!-- Login form -->
+    <div id="formLogin" class="modal-form">
+      <button class="btn-google" onclick="authWithGoogle()">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+        <span data-i="googleLogin">Войти через Google</span>
+      </button>
+      <div class="divider" data-i="or">или</div>
+      <input class="form-input" type="email" placeholder="Email" id="loginEmail">
+      <input class="form-input" type="password" placeholder="Пароль" id="loginPassword">
+      <button class="btn-submit" onclick="authWithEmail('login')" data-i="loginBtn">ВОЙТИ →</button>
+    </div>
+
+    <!-- Register form -->
+    <div id="formRegister" class="modal-form" style="display:none">
+      <button class="btn-google" onclick="authWithGoogle()">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+        <span data-i="googleRegister">Зарегистрироваться через Google</span>
+      </button>
+      <div class="divider" data-i="or">или</div>
+      <input class="form-input" type="email" placeholder="Email" id="regEmail">
+      <input class="form-input" type="password" placeholder="Пароль" id="regPassword">
+      <button class="btn-submit" onclick="authWithEmail('register')" data-i="registerBtn">ЗАРЕГИСТРИРОВАТЬСЯ →</button>
+    </div>
+  </div>
 </div>
 
 <script>
+// ══════════════════════════════════════════
+// UI TRANSLATIONS
+// ══════════════════════════════════════════
+const UI_LANGS = {
+  ru: {
+    login: 'Войти', register: 'Регистрация',
+    tabRights: 'Мои права', tabLabor: 'Труд', tabRental: 'Аренда',
+    tabFines: 'Штрафы', tabBanking: 'Банки', tabConsumer: 'Потребитель',
+    tabHistory: 'История',
+    disclaimer: '⚠️ Дост не заменяет профессионального юриста',
+    historyTitle: 'ИСТОРИЯ ЧАТОВ',
+    modalSubtitle: 'СОХРАНЯЙТЕ ИСТОРИЮ ЧАТОВ',
+    googleLogin: 'Войти через Google',
+    googleRegister: 'Зарегистрироваться через Google',
+    loginBtn: 'ВОЙТИ →', registerBtn: 'ЗАРЕГИСТРИРОВАТЬСЯ →',
+    or: 'или',
+    placeholder: 'Задайте вопрос...',
+    langNotice: '🌐 Пишите на любом языке — отвечу на том же',
+    historyEmpty: 'История пуста.\nВаши чаты появятся здесь.',
+    historyLoginPrompt: 'Войдите или зарегистрируйтесь,\nчтобы сохранять историю со всех устройств.',
+    historyLoginLink: 'Войти',
+    enterHint: 'Enter — отправить · Shift+Enter — новая строка',
+  },
+  en: {
+    login: 'Login', register: 'Sign up',
+    tabRights: 'My Rights', tabLabor: 'Labor', tabRental: 'Rental',
+    tabFines: 'Fines', tabBanking: 'Banking', tabConsumer: 'Consumer',
+    tabHistory: 'History',
+    disclaimer: '⚠️ Dost does not replace a professional lawyer',
+    historyTitle: 'CHAT HISTORY',
+    modalSubtitle: 'SAVE YOUR CHAT HISTORY',
+    googleLogin: 'Continue with Google',
+    googleRegister: 'Sign up with Google',
+    loginBtn: 'LOGIN →', registerBtn: 'SIGN UP →',
+    or: 'or',
+    placeholder: 'Ask anything...',
+    langNotice: '🌐 Write in any language — I\'ll respond in the same one',
+    historyEmpty: 'No history yet.\nYour chats will appear here.',
+    historyLoginPrompt: 'Login or register to save history\nacross all your devices.',
+    historyLoginLink: 'Login',
+    enterHint: 'Enter — send · Shift+Enter — new line',
+  },
+  kz: {
+    login: 'Кіру', register: 'Тіркелу',
+    tabRights: 'Менің құқықтарым', tabLabor: 'Еңбек', tabRental: 'Жалдам',
+    tabFines: 'Айыппұлдар', tabBanking: 'Банктер', tabConsumer: 'Тұтынушы',
+    tabHistory: 'Тарих',
+    disclaimer: '⚠️ Дост кәсіби заңгерді алмастырмайды',
+    historyTitle: 'ЧАТ ТАРИХЫ',
+    modalSubtitle: 'ТАРИХЫҢЫЗДЫ САҚТАҢЫЗ',
+    googleLogin: 'Google арқылы кіру',
+    googleRegister: 'Google арқылы тіркелу',
+    loginBtn: 'КІРУ →', registerBtn: 'ТІРКЕЛУ →',
+    or: 'немесе',
+    placeholder: 'Сұрақ қойыңыз...',
+    langNotice: '🌐 Кез келген тілде жазыңыз — сол тілде жауап беремін',
+    historyEmpty: 'Тарих жоқ.\nСіздің чаттарыңыз осында пайда болады.',
+    historyLoginPrompt: 'Тарихты сақтау үшін кіріңіз немесе тіркеліңіз.',
+    historyLoginLink: 'Кіру',
+    enterHint: 'Enter — жіберу · Shift+Enter — жаңа жол',
+  },
+  tr: {
+    login: 'Giriş', register: 'Kayıt ol',
+    tabRights: 'Haklarım', tabLabor: 'Emek', tabRental: 'Kiralık',
+    tabFines: 'Cezalar', tabBanking: 'Bankacılık', tabConsumer: 'Tüketici',
+    tabHistory: 'Geçmiş',
+    disclaimer: '⚠️ Dost profesyonel bir avukatın yerini tutmaz',
+    historyTitle: 'SOHBET GEÇMİŞİ',
+    modalSubtitle: 'SOHBET GEÇMİŞİNİZİ KAYDEDIN',
+    googleLogin: 'Google ile giriş',
+    googleRegister: 'Google ile kayıt ol',
+    loginBtn: 'GİRİŞ →', registerBtn: 'KAYIT OL →',
+    or: 'veya',
+    placeholder: 'Soru sorun...',
+    langNotice: '🌐 Herhangi bir dilde yazın — aynı dilde yanıt vereceğim',
+    historyEmpty: 'Henüz geçmiş yok.\nSohbetleriniz burada görünecek.',
+    historyLoginPrompt: 'Geçmişi kaydetmek için giriş yapın veya kayıt olun.',
+    historyLoginLink: 'Giriş',
+    enterHint: 'Enter — gönder · Shift+Enter — yeni satır',
+  }
+};
+
+let uiLang = 'ru';
+
+function setUILang(lang, label, fullName) {
+  uiLang = lang;
+  document.getElementById('langLabel').textContent = label;
+  document.querySelectorAll('.lang-option').forEach(o => o.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('langDropdown').classList.remove('open');
+
+  const t = UI_LANGS[lang];
+  // Update all data-i elements
+  document.querySelectorAll('[data-i]').forEach(el => {
+    const key = el.getAttribute('data-i');
+    if (t[key]) el.textContent = t[key];
+  });
+  // Placeholder
+  document.getElementById('msgInput').placeholder = t.placeholder;
+  // Re-render welcome
+  renderWelcome();
+}
+
+function toggleLangDropdown() {
+  document.getElementById('langDropdown').classList.toggle('open');
+}
+// Close dropdown on outside click
+document.addEventListener('click', e => {
+  if (!document.getElementById('langSelector').contains(e.target)) {
+    document.getElementById('langDropdown').classList.remove('open');
+  }
+});
+
+// ══════════════════════════════════════════
+// GEOLOCATION — detect user country
+// ══════════════════════════════════════════
+let userCountry = 'KZ'; // default Kazakhstan
+let userCountryName = 'Казахстан';
+
+async function detectCountry() {
+  try {
+    const res = await fetch('https://ipapi.co/json/');
+    const data = await res.json();
+    if (data.country_code) {
+      userCountry = data.country_code;
+      userCountryName = data.country_name || data.country_code;
+    }
+  } catch(e) {
+    // fallback to KZ
+  }
+  renderWelcome();
+}
+detectCountry();
+
+// ══════════════════════════════════════════
+// MODULE DEFINITIONS
+// ══════════════════════════════════════════
 const mods = {
   lex: {
     sendCls:'', inputCls:'', icon:'⚖️',
-    title:'My Rights / Мои права',
-    welcomeTitle:'Know Your Rights / Знайте свои права',
-    welcomeText:'Ask about your rights in any situation — fines, disputes, violations. Write in any language: English, Russian, Turkish, Uzbek...',
-    quick:[
-      {icon:'🚗', text:'Got a fine — how to appeal? / Штраф — как оспорить?', cls:''},
-      {icon:'💼', text:'Employer not paying salary / Работодатель не платит', cls:'qg'},
-      {icon:'🎓', text:'Need apostille for documents / Нужен апостиль', cls:'qa'},
-      {icon:'🏠', text:'Conflict with landlord / Конфликт с арендодателем', cls:''},
-    ],
-    topics:[
-      {icon:'🚗', label:'Fines / Штрафы', q:'Help me with a traffic fine'},
-      {icon:'💼', label:'Labor / Труд', q:'My employer is not paying my salary'},
-      {icon:'🛒', label:'Consumer rights / Потребитель', q:'I want to return a product'},
-      {icon:'🎓', label:'Documents / Документы', q:'I need an apostille for my diploma, what should I do?'},
-      {icon:'🏠', label:'Rental / Аренда', q:'I have a conflict with my landlord'},
-      {icon:'🏦', label:'Banking / Банк', q:'Problem with my bank'},
-    ],
-    saCls:'sa',
-    system:`You are Dost AI — a friendly legal rights assistant for people in Kazakhstan, Uzbekistan, Russia, Turkey and Central Asia.
+    getTitle: () => UI_LANGS[uiLang].tabRights,
+    getWelcomeTitle: () => ({ ru:'Знайте свои права', en:'Know Your Rights', kz:'Құқықтарыңызды біліңіз', tr:'Haklarınızı Bilin' })[uiLang] || 'Know Your Rights',
+    getWelcomeText: () => ({ ru:'Дост поможет разобраться в любой жизненной ситуации с юридической точки зрения — где бы вы ни находились. Права на работе, споры с арендодателем, штрафы, документы — спрашивайте на любом языке.', en:'Dost will help you navigate any life situation from a legal perspective — wherever you are. Work rights, landlord disputes, fines, documents — ask in any language.', kz:'Дост кез келген өмірлік жағдайды заңдық тұрғыдан шешуге көмектеседі. Жұмыс құқықтары, жалға алу дауы, айыппұлдар — кез келген тілде сұраңыз.', tr:'Dost, dünyanın her yerinde hukuki açıdan her durumda size yardımcı olacak. İş hakları, kiracı anlaşmazlıkları, para cezaları — herhangi bir dilde sorun.' })[uiLang] || '',
+    getQuick: () => ([
+      {icon:'🚗', text:{ru:'Штраф — как оспорить?', en:'Got a fine — how to appeal?', kz:'Айыппұл — қалай дауласу?', tr:'Ceza — nasıl itiraz edilir?'}, cls:''},
+      {icon:'💼', text:{ru:'Работодатель не платит зарплату', en:'Employer not paying salary', kz:'Жұмыс беруші жалақы төлемейді', tr:'İşveren maaş ödemiyor'}, cls:'qg'},
+      {icon:'🎓', text:{ru:'Нужен апостиль на документы', en:'Need apostille for documents', kz:'Құжаттарға апостиль керек', tr:'Belgeler için apostil gerekiyor'}, cls:'qa'},
+      {icon:'🏠', text:{ru:'Конфликт с арендодателем', en:'Conflict with landlord', kz:'Жалға берушімен қақтығыс', tr:'Ev sahibiyle anlaşmazlık'}, cls:''},
+    ]),
+    getSystem: () => `You are Dost AI — a friendly, knowledgeable legal rights assistant available to people in any country worldwide.
 
-CRITICAL LANGUAGE RULE: Always respond in the SAME language the user writes in. If they write in English → respond in English. Russian → Russian. Turkish → Turkish. Uzbek → Uzbek. Mixed → use the dominant language.
+CRITICAL LANGUAGE RULE: Always respond in the SAME language the user writes in. Russian → Russian. English → English. Turkish → Turkish. Kazakh → Kazakh. If mixed, use the dominant language.
+
+LOCATION CONTEXT: The user appears to be in ${userCountryName} (${userCountry}). By default, apply laws of this country. However, if the user explicitly mentions another country or legal system (e.g., "according to Russian Labor Code" / "по ТК РФ"), answer specifically for that country instead.
+
+WEB SEARCH FOR LAWS: When citing specific laws, articles, or regulations, always search for the most current version. Format citations as:
+<div class="tag law">📜 [Law name], Article [X] · Last updated: [year] · <a href="[official_url]" target="_blank">Source</a></div>
 
 If the user uploads a document image, read it carefully and explain what it says and what they should do.
 
@@ -617,91 +982,131 @@ Format responses with HTML:
 - <h4> for headings
 - <ul><li> for lists
 - Steps: <div class="step-row"><span class="sn">01</span><div>text</div></div>
-- Deadlines: <div class="tag dl">⏰ Deadline: X days</div>
+- Deadlines: <div class="tag dl">⏰ Срок: X дней</div>
 - Info: <div class="tag inf">ℹ️ text</div>
-- Always end with: <div class="disclaimer">This information is for educational purposes. For official legal actions, please consult a licensed lawyer.</div>`
+- Always end with: <div class="disclaimer">Эта информация носит образовательный характер. Для официальных юридических действий обратитесь к лицензированному юристу.</div>`
   },
 
   doc: {
     sendCls:'g', inputCls:'fc', icon:'📋',
-    title:'Documents / Документы',
-    welcomeTitle:"Let's Draft Your Document",
-    welcomeText:"I'll help you write any complaint, application or letter — ready to send. Upload a document photo and I'll explain it or help you respond.",
-    quick:[
-      {icon:'📝', text:'Write a complaint to a bank', cls:''},
-      {icon:'⚡', text:'Complaint about bad product / Претензия на товар', cls:'qg'},
-      {icon:'🎓', text:'Apostille & diploma recognition', cls:'qa'},
-      {icon:'✉️', text:'Letter to employer / Письмо работодателю', cls:''},
-    ],
-    topics:[
-      {icon:'🏦', label:'Bank complaint', q:'Help me write a complaint to a bank'},
-      {icon:'🛒', label:'Product complaint', q:'Help me write a complaint about a defective product'},
-      {icon:'🏢', label:'Government application', q:'Help me write an application to a government office'},
-      {icon:'🎓', label:'Apostille / Diploma', q:'Help me understand the apostille process for my diploma'},
-      {icon:'💼', label:'Letter to employer', q:'Help me write a letter to my employer'},
-      {icon:'⚖️', label:'Legal claim', q:'Help me draft a legal claim'},
-    ],
-    saCls:'sg',
-    system:`You are Dost AI — a document drafting assistant for everyday people in Kazakhstan, Uzbekistan, Russia and Turkey.
+    getTitle: () => UI_LANGS[uiLang].tabLabor,
+    getWelcomeTitle: () => ({ ru:'Составим документ', en:"Let's Draft Your Document", kz:'Құжат жасайық', tr:'Belgenizi Hazırlayalım' })[uiLang] || "Let's Draft",
+    getWelcomeText: () => ({ ru:'Помогу написать любую жалобу, заявление или письмо — готовое к отправке. Загрузите документ — объясню что в нём написано.', en:"I'll help you write any complaint, application or letter — ready to send. Upload a document and I'll explain what it means.", kz:'Кез келген шағым, өтініш немесе хат жазуға көмектесемін. Құжат жүктеңіз — мен оны түсіндіремін.', tr:'Herhangi bir şikayet, başvuru veya mektubu yazmanıza yardımcı olacağım. Belge yükleyin — açıklayayım.' })[uiLang] || '',
+    getQuick: () => ([
+      {icon:'📝', text:{ru:'Написать жалобу в банк', en:'Write a complaint to a bank', kz:'Банкке шағым жазу', tr:'Bankaya şikayet yaz'}, cls:''},
+      {icon:'⚡', text:{ru:'Претензия на некачественный товар', en:'Complaint about defective product', kz:'Ақаулы тауарға претензия', tr:'Kusurlu ürün şikayeti'}, cls:'qg'},
+      {icon:'🎓', text:{ru:'Апостиль и легализация', en:'Apostille & legalization', kz:'Апостиль және заңдастыру', tr:'Apostil ve tasdik'}, cls:'qa'},
+      {icon:'✉️', text:{ru:'Письмо работодателю', en:'Letter to employer', kz:'Жұмыс берушіге хат', tr:'İşverene mektup'}, cls:''},
+    ]),
+    getSystem: () => `You are Dost AI — a document drafting assistant for everyday people in any country worldwide.
 
-CRITICAL LANGUAGE RULE: Always respond in the SAME language the user writes in. English → English. Russian → Russian. Turkish → Turkish. Uzbek → Uzbek.
+CRITICAL LANGUAGE RULE: Always respond in the SAME language the user writes in.
 
-If the user uploads a document image, read it carefully, explain what it says in simple terms, and ask if they need help responding to it.
+LOCATION CONTEXT: The user appears to be in ${userCountryName} (${userCountry}). Apply local legal standards by default. If they specify another country, use that.
 
-First ask clarifying questions if needed, then provide a ready-to-use document.
+WEB SEARCH: When referencing specific legal requirements for documents, search for current requirements. Cite sources with:
+<div class="tag law">📜 [Reference] · <a href="[url]" target="_blank">Source</a></div>
 
 Format with HTML:
 - <h4> for headings
 - Ready document: <div class="doc-block">document text here</div>
 - Steps: <div class="step-row"><span class="sn g">01</span><div>text</div></div>
 - <div class="tag ok">✓ text</div>
-- End with: <div class="disclaimer">This template is for guidance only. For complex cases, please consult a lawyer.</div>`
+- End with: <div class="disclaimer">Этот шаблон носит ориентировочный характер. Для сложных случаев обратитесь к юристу.</div>`
   },
 
-  pension: {
-    sendCls:'a', inputCls:'fa', icon:'👴',
-    title:'Pension & Benefits / Пенсия',
-    welcomeTitle:'Pension & Social Benefits',
-    welcomeText:"I'll explain your pension rights, benefits and allowances. Upload a document from the pension fund and I'll explain what it means.",
-    quick:[
-      {icon:'💰', text:'What pension am I entitled to?', cls:'qa'},
-      {icon:'🎁', text:'What benefits can I get? / Какие льготы?', cls:''},
-      {icon:'📅', text:'When can I retire? / Когда на пенсию?', cls:'qg'},
-      {icon:'🏥', text:'Medical benefits / Льготы на лечение', cls:''},
-    ],
-    topics:[
-      {icon:'💰', label:'Pension amount', q:'How is my pension calculated?'},
-      {icon:'📅', label:'Retirement age', q:'When can I retire?'},
-      {icon:'🎁', label:'Benefits / Льготы', q:'What benefits are available for pensioners?'},
-      {icon:'🏥', label:'Medical benefits', q:'What medical benefits am I entitled to?'},
-      {icon:'🚌', label:'Transport & utilities', q:'What transport and utility benefits exist for pensioners?'},
-      {icon:'📋', label:'Required documents', q:'What documents do I need to apply for pension?'},
-    ],
-    saCls:'sam',
-    system:`You are Dost AI — a kind and patient pension & social benefits assistant for people in Kazakhstan.
+  rental: {
+    sendCls:'', inputCls:'', icon:'🏠',
+    getTitle: () => UI_LANGS[uiLang].tabRental,
+    getWelcomeTitle: () => ({ ru:'Вопросы аренды', en:'Rental Questions', kz:'Жалдам мәселелері', tr:'Kiralık Sorular' })[uiLang] || 'Rental',
+    getWelcomeText: () => ({ ru:'Помогу разобраться с правами арендатора и арендодателя, составить или проверить договор аренды.', en:"I'll help you understand tenant and landlord rights, draft or review a rental agreement.", kz:'Жалға алушы мен жалға берушінің құқықтарын түсінуге, жалдау шартын жасауға немесе тексеруге көмектесемін.', tr:'Kiracı ve ev sahibi haklarını anlamanıza, kira sözleşmesi hazırlamanıza yardımcı olacağım.' })[uiLang] || '',
+    getQuick: () => ([
+      {icon:'📄', text:{ru:'Проверить договор аренды', en:'Review rental contract', kz:'Жалдау шартын тексеру', tr:'Kira sözleşmesini incele'}, cls:''},
+      {icon:'💰', text:{ru:'Арендодатель не возвращает залог', en:'Landlord not returning deposit', kz:'Жалға беруші кепілді қайтармайды', tr:'Ev sahibi depozitoyu iade etmiyor'}, cls:'qg'},
+      {icon:'🔧', text:{ru:'Ремонт — кто должен платить?', en:'Repairs — who should pay?', kz:'Жөндеу — кім төлеуі керек?', tr:'Tamirat — kim ödemeli?'}, cls:''},
+      {icon:'📋', text:{ru:'Выселение — мои права', en:'Eviction — my rights', kz:'Шығарып жіберу — менің құқықтарым', tr:'Tahliye — haklarım'}, cls:'qa'},
+    ]),
+    getSystem: () => `You are Dost AI — a rental law assistant for tenants and landlords worldwide.
 
-CRITICAL LANGUAGE RULE: Always respond in the SAME language the user writes in. English → English. Russian → Russian. Turkish → Turkish. Uzbek → Uzbek.
+CRITICAL LANGUAGE RULE: Always respond in the SAME language the user writes in.
+LOCATION CONTEXT: User is in ${userCountryName} (${userCountry}). Apply local rental law by default.
+WEB SEARCH: Search for current rental laws and cite: <div class="tag law">📜 [Law] · <a href="[url]" target="_blank">Source</a></div>
+Format: <h4>, <ul><li>, step-row, tags. End with disclaimer.`
+  },
 
-If the user uploads a document from the pension fund (ENPF or other), read it carefully and explain what it says in simple, friendly terms.
+  fines: {
+    sendCls:'', inputCls:'', icon:'🚗',
+    getTitle: () => UI_LANGS[uiLang].tabFines,
+    getWelcomeTitle: () => ({ ru:'Штрафы и нарушения', en:'Fines & Violations', kz:'Айыппұлдар', tr:'Cezalar ve İhlaller' })[uiLang] || 'Fines',
+    getWelcomeText: () => ({ ru:'Помогу оспорить штраф, разобраться с административным нарушением или понять как избежать санкций.', en:"I'll help you appeal a fine, understand an administrative violation, or avoid sanctions.", kz:'Айыппұлға дау айтуға, әкімшілік бұзушылықты түсінуге немесе санкциялардан аулақ болуға көмектесемін.', tr:'Para cezasına itiraz etmenize, idari ihlali anlamanıza yardımcı olacağım.' })[uiLang] || '',
+    getQuick: () => ([
+      {icon:'📸', text:{ru:'Штраф с камеры — как оспорить', en:'Camera fine — how to appeal', kz:'Камерадан айыппұл — қалай дауласу', tr:'Kamera cezası — nasıl itiraz edilir'}, cls:''},
+      {icon:'✈️', text:{ru:'Был за границей когда выписали штраф', en:'Was abroad when fine was issued', kz:'Айыппұл шыққанда шетелде болдым', tr:'Ceza kesildiğinde yurt dışındaydım'}, cls:'qg'},
+      {icon:'⏱️', text:{ru:'Пропустил срок оплаты штрафа', en:'Missed fine payment deadline', kz:'Айыппұл төлеу мерзімін өткіздім', tr:'Ceza ödeme süresini kaçırdım'}, cls:'qa'},
+      {icon:'📋', text:{ru:'Административный протокол — что делать', en:'Administrative protocol — what to do', kz:'Әкімшілік хаттама — не істеу керек', tr:'İdari tutanak — ne yapmalı'}, cls:''},
+    ]),
+    getSystem: () => `You are Dost AI — a fines and administrative violations assistant worldwide.
 
-Topics: ENPF, basic pension, labor pension, social benefits, retirement age, required documents.
+CRITICAL LANGUAGE RULE: Always respond in the SAME language the user writes in.
+LOCATION CONTEXT: User is in ${userCountryName} (${userCountry}). Apply local law by default.
+WEB SEARCH: Search for current fine amounts and appeal procedures. Cite: <div class="tag law">📜 [Law] · <a href="[url]" target="_blank">Source</a></div>
+Format: <h4>, steps, tags. End with disclaimer.`
+  },
 
-Format with HTML:
-- <h4> for headings
-- <ul><li> for lists
-- Steps: <div class="step-row"><span class="sn a">01</span><div>text</div></div>
-- Amounts: <div class="tag dl">💰 text</div>
-- <div class="tag ok">✓ text</div>
-- End with: <div class="disclaimer">Amounts and conditions may change. For accurate information, please contact ENPF or your local service center.</div>`
+  banking: {
+    sendCls:'', inputCls:'', icon:'🏦',
+    getTitle: () => UI_LANGS[uiLang].tabBanking,
+    getWelcomeTitle: () => ({ ru:'Банки и финансы', en:'Banking & Finance', kz:'Банктер мен қаржы', tr:'Bankacılık ve Finans' })[uiLang] || 'Banking',
+    getWelcomeText: () => ({ ru:'Помогу разобраться с банковскими спорами, кредитами, мошенничеством и защитой прав потребителя финансовых услуг.', en:"I'll help with banking disputes, loans, fraud, and consumer rights in financial services.", kz:'Банктік дауларды, несиелерді, алаяқтықты шешуге және қаржылық қызмет тұтынушысының құқықтарын қорғауға көмектесемін.', tr:'Bankacılık anlaşmazlıkları, krediler, dolandırıcılık ve finansal tüketici hakları konusunda yardımcı olacağım.' })[uiLang] || '',
+    getQuick: () => ([
+      {icon:'🔒', text:{ru:'Банк заблокировал счёт', en:'Bank blocked my account', kz:'Банк шотымды бұғаттады', tr:'Banka hesabımı bloke etti'}, cls:''},
+      {icon:'💳', text:{ru:'Мошенничество с картой', en:'Credit card fraud', kz:'Картамен алаяқтық', tr:'Kart dolandırıcılığı'}, cls:'qg'},
+      {icon:'📊', text:{ru:'Банк навязывает услуги', en:'Bank imposing unwanted services', kz:'Банк қызметтерді мәжбүрлейді', tr:'Banka hizmetleri dayatıyor'}, cls:''},
+      {icon:'💰', text:{ru:'Спор по кредиту', en:'Loan dispute', kz:'Несие бойынша дау', tr:'Kredi anlaşmazlığı'}, cls:'qa'},
+    ]),
+    getSystem: () => `You are Dost AI — a banking and financial rights assistant worldwide.
+
+CRITICAL LANGUAGE RULE: Always respond in the SAME language the user writes in.
+LOCATION CONTEXT: User is in ${userCountryName} (${userCountry}). Apply local banking laws and regulations.
+WEB SEARCH: Search for current banking regulations and consumer protection laws. Cite sources.
+Format: <h4>, steps, tags. End with disclaimer.`
+  },
+
+  consumer: {
+    sendCls:'', inputCls:'', icon:'👤',
+    getTitle: () => UI_LANGS[uiLang].tabConsumer,
+    getWelcomeTitle: () => ({ ru:'Права потребителя', en:'Consumer Rights', kz:'Тұтынушы құқықтары', tr:'Tüketici Hakları' })[uiLang] || 'Consumer Rights',
+    getWelcomeText: () => ({ ru:'Помогу с возвратом товара, гарантийным ремонтом, защитой прав при покупках онлайн и офлайн.', en:"I'll help with product returns, warranty repairs, and consumer protection for online and offline purchases.", kz:'Тауарды қайтарумен, кепілдікті жөндеумен, онлайн және офлайн сатып алулардағы тұтынушы құқықтарын қорғаумен көмектесемін.', tr:'Ürün iade, garanti tamiri ve online/offline alışverişlerde tüketici haklarıyla ilgili yardımcı olacağım.' })[uiLang] || '',
+    getQuick: () => ([
+      {icon:'📦', text:{ru:'Хочу вернуть товар', en:'Want to return a product', kz:'Тауарды қайтарғым келеді', tr:'Ürün iade etmek istiyorum'}, cls:''},
+      {icon:'🔧', text:{ru:'Отказывают в гарантийном ремонте', en:'Refusing warranty repair', kz:'Кепілдікті жөндеуден бас тартады', tr:'Garanti tamirini reddediyorlar'}, cls:'qg'},
+      {icon:'🛒', text:{ru:'Обман в интернет-магазине', en:'Online shop fraud', kz:'Интернет-дүкендегі алдау', tr:'Online mağaza dolandırıcılığı'}, cls:''},
+      {icon:'📋', text:{ru:'Жалоба на качество услуг', en:'Complaint about service quality', kz:'Қызмет сапасына шағым', tr:'Hizmet kalitesi şikayeti'}, cls:'qa'},
+    ]),
+    getSystem: () => `You are Dost AI — a consumer rights assistant worldwide.
+
+CRITICAL LANGUAGE RULE: Always respond in the SAME language the user writes in.
+LOCATION CONTEXT: User is in ${userCountryName} (${userCountry}). Apply local consumer protection laws.
+WEB SEARCH: Search for current consumer protection laws. Cite: <div class="tag law">📜 [Law] · <a href="[url]" target="_blank">Source</a></div>
+Format: <h4>, steps, tags. End with disclaimer.`
   }
 };
 
+// ══════════════════════════════════════════
+// APP STATE
+// ══════════════════════════════════════════
 let cur = 'lex';
 let messages = [];
 let pendingImageBase64 = null;
 let pendingImageName = '';
 let pendingMediaType = 'image/jpeg';
+let pendingTextContent = null;
+let currentUser = null;
+let chatHistory = []; // [{id, title, messages, date, module}]
 
+// ══════════════════════════════════════════
+// MODULE SWITCH
+// ══════════════════════════════════════════
 function switchModule(mod, tabEl) {
   cur = mod;
   messages = [];
@@ -716,43 +1121,24 @@ function switchModule(mod, tabEl) {
   document.getElementById('sendBtn').className = 'send-btn ' + m.sendCls;
   document.getElementById('inputRow').className = 'input-row ' + m.inputCls;
 
-  renderSidebar();
   renderWelcome();
-}
-
-function renderSidebar() {
-  const m = mods[cur];
-  const sb = document.getElementById('sidebar');
-  sb.innerHTML = `<div class="sidebar-label">QUICK TOPICS</div>`;
-  m.topics.forEach(t => {
-    const btn = document.createElement('button');
-    btn.className = 'side-btn';
-    btn.innerHTML = `<span>${t.icon}</span>${t.label}`;
-    btn.onclick = () => {
-      document.querySelectorAll('.side-btn').forEach(b => b.className='side-btn');
-      btn.classList.add(m.saCls);
-      document.getElementById('msgInput').value = t.q;
-      sendMsg();
-    };
-    sb.appendChild(btn);
-  });
 }
 
 function renderWelcome() {
   const m = mods[cur];
+  const t = UI_LANGS[uiLang];
+  const quickItems = m.getQuick();
   document.getElementById('chatMessages').innerHTML = `
     <div class="welcome">
       <div class="welcome-emoji">${m.icon}</div>
-      <h2>${m.welcomeTitle}</h2>
-      <p>${m.welcomeText}</p>
-      <div class="lang-notice">
-        🌐 Write in any language — I'll respond in the same one
-      </div>
+      <h2>${m.getWelcomeTitle()}</h2>
+      <p>${m.getWelcomeText()}</p>
+      <div class="location-pill">📍 ${userCountryName} · по умолчанию</div>
       <div class="quick-grid">
-        ${m.quick.map(q=>`
-          <div class="quick-card ${q.cls}" onclick="askQuick('${q.text.replace(/'/g,"\\'")}')">
+        ${quickItems.map(q=>`
+          <div class="quick-card ${q.cls}" onclick="askQuick('${(q.text[uiLang]||q.text.ru).replace(/'/g,"\\'")}')">
             <div class="qc-icon">${q.icon}</div>
-            <div class="qc-text">${q.text}</div>
+            <div class="qc-text">${q.text[uiLang]||q.text.ru}</div>
           </div>
         `).join('')}
       </div>
@@ -765,7 +1151,120 @@ function askQuick(text) {
   sendMsg();
 }
 
-// File type helpers
+// ══════════════════════════════════════════
+// HISTORY
+// ══════════════════════════════════════════
+function toggleHistory() {
+  const panel = document.getElementById('historyPanel');
+  panel.classList.toggle('open');
+  if (panel.classList.contains('open')) renderHistory();
+}
+
+function renderHistory() {
+  const t = UI_LANGS[uiLang];
+  const content = document.getElementById('historyContent');
+
+  // Load from localStorage
+  const stored = JSON.parse(localStorage.getItem('dost_history') || '[]');
+  chatHistory = stored;
+
+  if (stored.length === 0) {
+    content.innerHTML = `
+      <div class="history-empty">${t.historyEmpty}</div>
+      ${!currentUser ? `<div class="history-login-prompt">
+        ${t.historyLoginPrompt}<br><br>
+        <a onclick="openAuth('login')">${t.historyLoginLink}</a>
+      </div>` : ''}
+    `;
+    return;
+  }
+
+  content.innerHTML = stored.map((item, i) => `
+    <div class="history-item" onclick="loadChat(${i})">
+      <div class="history-item-title">${item.title}</div>
+      <div class="history-item-date">${item.date}</div>
+    </div>
+  `).join('');
+}
+
+function saveCurrentChat() {
+  if (messages.length < 2) return;
+  const firstMsg = messages[0]?.content || '';
+  const title = typeof firstMsg === 'string' ? firstMsg.slice(0,50) : 'Новый чат';
+  const date = new Date().toLocaleDateString(uiLang === 'en' ? 'en-US' : 'ru-RU', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+
+  const stored = JSON.parse(localStorage.getItem('dost_history') || '[]');
+  stored.unshift({ title, date, messages: messages.slice(), module: cur });
+  if (stored.length > 50) stored.pop(); // keep last 50
+  localStorage.setItem('dost_history', JSON.stringify(stored));
+}
+
+function loadChat(index) {
+  const stored = JSON.parse(localStorage.getItem('dost_history') || '[]');
+  const item = stored[index];
+  if (!item) return;
+
+  cur = item.module || 'lex';
+  messages = item.messages || [];
+
+  // Switch tab
+  document.querySelectorAll('.tab[data-mod]').forEach(t => {
+    t.classList.toggle('active', t.getAttribute('data-mod') === cur);
+  });
+
+  // Render messages
+  const chat = document.getElementById('chatMessages');
+  chat.innerHTML = '';
+  messages.forEach(msg => {
+    addMsg(msg.role === 'user' ? 'user' : 'ai', msg.content);
+  });
+
+  document.getElementById('historyPanel').classList.remove('open');
+}
+
+// ══════════════════════════════════════════
+// AUTH MODAL
+// ══════════════════════════════════════════
+function openAuth(tab) {
+  document.getElementById('authModal').classList.add('open');
+  switchAuthTab(tab);
+}
+
+function closeAuth() {
+  document.getElementById('authModal').classList.remove('open');
+}
+
+function switchAuthTab(tab) {
+  document.getElementById('formLogin').style.display = tab === 'login' ? 'flex' : 'none';
+  document.getElementById('formRegister').style.display = tab === 'register' ? 'flex' : 'none';
+  document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+  document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+}
+
+// Close modal on overlay click
+document.getElementById('authModal').addEventListener('click', function(e) {
+  if (e.target === this) closeAuth();
+});
+
+function authWithGoogle() {
+  // Placeholder — integrate with your auth provider
+  alert('Google auth — подключите Firebase или Auth0');
+}
+
+function authWithEmail(type) {
+  const email = document.getElementById(type === 'login' ? 'loginEmail' : 'regEmail').value;
+  const pass = document.getElementById(type === 'login' ? 'loginPassword' : 'regPassword').value;
+  if (!email || !pass) return alert('Заполните все поля');
+  // Placeholder — integrate with your auth provider
+  currentUser = { email };
+  closeAuth();
+  document.getElementById('loginBtn').textContent = email.split('@')[0];
+  document.getElementById('registerBtn').style.display = 'none';
+}
+
+// ══════════════════════════════════════════
+// FILE HANDLING
+// ══════════════════════════════════════════
 const FILE_TYPES = {
   image:   { exts: ['jpg','jpeg','png','gif','webp'], icon: '🖼️', label: 'IMAGE', mode: 'image' },
   pdf:     { exts: ['pdf'],                           icon: '📄', label: 'PDF',   mode: 'pdf' },
@@ -783,9 +1282,6 @@ function getFileType(filename) {
   return { key:'unknown', icon:'📎', label:'FILE', mode:'text' };
 }
 
-let pendingTextContent = null; // for Word/Excel/TXT extracted text
-
-// File handling
 async function handleFile(e) {
   const file = e.target.files[0];
   if (!file) return;
@@ -798,7 +1294,7 @@ async function handleFile(e) {
 
   const svgIcon = (icon) => `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="52" height="52"><rect width="52" height="52" rx="8" fill="%23c8922a" opacity="0.12"/><text x="50%" y="56%" dominant-baseline="middle" text-anchor="middle" font-size="28">' + icon + '</text></svg>')}`;
 
-  function showPreview(thumbSrc, sublabel) {
+  function showPreview(thumbSrc) {
     document.getElementById('imgPreviewThumb').src = thumbSrc;
     document.getElementById('imgPreviewName').textContent = file.name;
     document.getElementById('imgPreviewSub').textContent = `${ftype.icon} ${ftype.label} ATTACHED · AI WILL READ IT`;
@@ -806,7 +1302,6 @@ async function handleFile(e) {
   }
 
   if (ftype.mode === 'image') {
-    // Native image — send as base64 image
     pendingMediaType = file.type || 'image/jpeg';
     const reader = new FileReader();
     reader.onload = ev => {
@@ -815,9 +1310,7 @@ async function handleFile(e) {
       showPreview(dataUrl);
     };
     reader.readAsDataURL(file);
-
   } else if (ftype.mode === 'pdf') {
-    // PDF — send as document
     pendingMediaType = 'application/pdf';
     const reader = new FileReader();
     reader.onload = ev => {
@@ -825,52 +1318,39 @@ async function handleFile(e) {
       showPreview(svgIcon('📄'));
     };
     reader.readAsDataURL(file);
-
   } else if (ftype.key === 'word') {
-    // Word — extract text with mammoth
     const arrayBuf = await file.arrayBuffer();
     try {
       const result = await mammoth.extractRawText({ arrayBuffer: arrayBuf });
-      pendingTextContent = result.value.slice(0, 8000); // limit
+      pendingTextContent = result.value.slice(0, 8000);
       pendingMediaType = 'text';
       showPreview(svgIcon('📝'));
-    } catch(err) {
-      alert('Could not read Word file. Try saving as .docx');
-    }
-
+    } catch(err) { alert('Could not read Word file.'); }
   } else if (ftype.key === 'excel') {
-    // Excel — extract with SheetJS
     const arrayBuf = await file.arrayBuffer();
     try {
       const wb = XLSX.read(arrayBuf, { type: 'array' });
       let text = '';
       wb.SheetNames.forEach(name => {
-        const ws = wb.Sheets[name];
-        text += `[Sheet: ${name}]\n` + XLSX.utils.sheet_to_csv(ws) + '\n\n';
+        text += `[Sheet: ${name}]\n` + XLSX.utils.sheet_to_csv(wb.Sheets[name]) + '\n\n';
       });
       pendingTextContent = text.slice(0, 8000);
       pendingMediaType = 'text';
       showPreview(svgIcon('📊'));
-    } catch(err) {
-      alert('Could not read Excel file.');
-    }
-
+    } catch(err) { alert('Could not read Excel file.'); }
   } else if (ftype.key === 'ppt') {
-    // PowerPoint — extract text with SheetJS (basic)
     const arrayBuf = await file.arrayBuffer();
     try {
       const wb = XLSX.read(arrayBuf, { type: 'array' });
       let text = wb.SheetNames.map(n => XLSX.utils.sheet_to_csv(wb.Sheets[n])).join('\n');
-      pendingTextContent = ('[PowerPoint file: ' + file.name + ']\n' + text).slice(0, 8000);
+      pendingTextContent = ('[PowerPoint: ' + file.name + ']\n' + text).slice(0, 8000);
       pendingMediaType = 'text';
       showPreview(svgIcon('📑'));
     } catch(err) {
-      // Fallback: just send filename info
-      pendingTextContent = `[PowerPoint file attached: ${file.name}. Please note I could not fully parse this file, but the user wants help with it.]`;
+      pendingTextContent = `[PowerPoint attached: ${file.name}]`;
       pendingMediaType = 'text';
       showPreview(svgIcon('📑'));
     }
-
   } else if (ftype.key === 'txt') {
     const text = await file.text();
     pendingTextContent = text.slice(0, 8000);
@@ -888,6 +1368,9 @@ function removeImage() {
   document.getElementById('imgPreviewThumb').src = '';
 }
 
+// ══════════════════════════════════════════
+// MESSAGES
+// ══════════════════════════════════════════
 function addMsg(role, html, imgSrc) {
   const chat = document.getElementById('chatMessages');
   const w = chat.querySelector('.welcome');
@@ -895,8 +1378,8 @@ function addMsg(role, html, imgSrc) {
 
   const div = document.createElement('div');
   div.className = 'msg ' + role;
-  const av = role==='ai' ? mods[cur].icon : 'D';
-  const imgHtml = (imgSrc && role==='user') ? `<img src="${imgSrc}" alt="document">` : '';
+  const av = role === 'ai' ? mods[cur].icon : 'D';
+  const imgHtml = (imgSrc && role === 'user') ? `<img src="${imgSrc}" alt="document">` : '';
   div.innerHTML = `<div class="avatar">${av}</div><div class="bubble">${imgHtml}${html}</div>`;
   chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
@@ -914,6 +1397,9 @@ function addTyping() {
   chat.scrollTop = chat.scrollHeight;
 }
 
+// ══════════════════════════════════════════
+// SEND MESSAGE
+// ══════════════════════════════════════════
 async function sendMsg() {
   const input = document.getElementById('msgInput');
   const text = input.value.trim();
@@ -940,7 +1426,7 @@ async function sendMsg() {
 
   addMsg('user', displayText, imgSrc);
 
-  // Build message content for API
+  // Build API content
   let userContent;
   if (isPDF && pendingImageBase64) {
     userContent = [
@@ -955,22 +1441,19 @@ async function sendMsg() {
   } else if (isTextFile) {
     const filePrompt = text
       ? `${text}\n\n[File: ${pendingImageName}]\n${pendingTextContent}`
-      : `Please read this file carefully and explain what it says and what I should do.\n\n[File: ${pendingImageName}]\n${pendingTextContent}`;
+      : `Please read this file and explain what it says.\n\n[File: ${pendingImageName}]\n${pendingTextContent}`;
     userContent = filePrompt;
   } else {
     userContent = text;
   }
 
-  // For history: store text-only version (no base64 image to avoid breaking history)
-  const historyContent = text || 'I uploaded a document image for you to read and explain.';
+  const historyContent = text || 'I uploaded a document for you to read and explain.';
   messages.push({ role:'user', content: historyContent });
 
-  // Clear image
   removeImage();
   addTyping();
 
   try {
-    // Build messages for THIS request: replace last user message with full content (image + text)
     const requestMessages = [
       ...messages.slice(0, -1),
       { role:'user', content: userContent }
@@ -981,8 +1464,8 @@ async function sendMsg() {
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
         model:'claude-sonnet-4-20250514',
-        max_tokens:1000,
-        system: mods[cur].system,
+        max_tokens:1500,
+        system: mods[cur].getSystem(),
         messages: requestMessages
       })
     });
@@ -991,16 +1474,16 @@ async function sendMsg() {
     if (data.error) throw new Error(data.error);
     const reply = data.content?.[0]?.text || 'No response received.';
 
-    // Store assistant reply in history
     messages.push({ role:'assistant', content: reply });
-
     document.getElementById('typing-el')?.remove();
     addMsg('ai', reply);
 
+    // Auto-save to localStorage
+    saveCurrentChat();
+
   } catch(e) {
     document.getElementById('typing-el')?.remove();
-    addMsg('ai',`<p style="color:var(--muted)">⚠️ Error: ${e.message || 'Connection failed'}. Please try again.</p>`);
-    // Remove failed user message from history
+    addMsg('ai',`<p style="color:var(--muted)">⚠️ Ошибка: ${e.message || 'Connection failed'}. Попробуйте ещё раз.</p>`);
     messages.pop();
   }
 
@@ -1008,7 +1491,9 @@ async function sendMsg() {
   input.focus();
 }
 
-renderSidebar();
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
 renderWelcome();
 </script>
 </body>
