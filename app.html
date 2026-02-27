@@ -1250,7 +1250,8 @@ function loadChat(index) {
 // ══════════════════════════════════════════
 const SUPABASE_URL = 'https://qepnxzgwggovmeqdapgw.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_lkwXPgKj0ztFR3n-UmiVbw_SYLJJegM';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const { createClient } = window.supabase;
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Check session on load
 supabase.auth.getSession().then(({ data: { session } }) => {
