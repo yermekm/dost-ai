@@ -1,1 +1,1279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dost.AI — Your Friend in Any Situation</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IBM+Plex+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f0e8;
+  --paper: #fdfaf4;
+  --dark: #1a1508;
+  --ink: #2d2510;
+  --accent: #c8922a;
+  --accent2: #8b4513;
+  --muted: #8a7d65;
+  --border: #d4c9a8;
+  --surface: #efe8d5;
+  --green: #2d5a27;
+  --amber: #b8760a;
+  --blue: #2a4a8a;
+}
 
+* { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Lora', serif;
+  overflow-x: hidden;
+}
+
+/* Texture */
+body::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ─── NAV ─── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 48px;
+  background: rgba(253,250,244,0.88);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--dark);
+  letter-spacing: -1px;
+  text-decoration: none;
+}
+.nav-logo span { color: var(--accent); }
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  list-style: none;
+}
+
+.nav-links a {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--ink); }
+
+.nav-cta {
+  background: var(--dark) !important;
+  color: var(--accent) !important;
+  padding: 9px 20px;
+  border-radius: 8px;
+  transition: background 0.2s !important;
+}
+.nav-cta:hover { background: var(--accent) !important; color: #fff !important; }
+
+.lang-switch {
+  display: flex;
+  gap: 4px;
+}
+.lang-btn {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.lang-btn.active, .lang-btn:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* ─── HERO ─── */
+.hero {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 120px 48px 80px;
+  overflow: hidden;
+}
+
+.hero-bg-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(120px, 20vw, 280px);
+  font-weight: 900;
+  color: rgba(200,146,42,0.05);
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+  letter-spacing: -8px;
+}
+
+.hero-content {
+  max-width: 640px;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.hero-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--accent);
+  background: rgba(200,146,42,0.1);
+  border: 1px solid rgba(200,146,42,0.25);
+  padding: 5px 12px;
+  border-radius: 20px;
+}
+
+.hero-flags { display:flex; gap:6px; font-size:18px; }
+
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(42px, 5vw, 68px);
+  font-weight: 900;
+  line-height: 1.1;
+  color: var(--dark);
+  margin-bottom: 24px;
+  letter-spacing: -2px;
+}
+
+.hero h1 em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.hero-sub {
+  font-size: 18px;
+  line-height: 1.75;
+  color: var(--muted);
+  margin-bottom: 40px;
+  max-width: 520px;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--dark);
+  color: var(--accent);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 2px;
+  padding: 14px 28px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: all 0.2s;
+  border: 2px solid var(--dark);
+}
+.btn-primary:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(200,146,42,0.25);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  color: var(--ink);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 2px;
+  padding: 14px 28px;
+  border-radius: 10px;
+  text-decoration: none;
+  border: 2px solid var(--border);
+  transition: all 0.2s;
+}
+.btn-secondary:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.hero-visual {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48%;
+  padding: 120px 48px 80px 0;
+  z-index: 1;
+}
+
+/* Chat mockup */
+.chat-mockup {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 24px 64px rgba(26,21,8,0.12);
+  max-width: 420px;
+  margin-left: auto;
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+.mockup-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+
+.mockup-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--dark);
+}
+.mockup-logo span { color: var(--accent); }
+
+.mockup-status {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--green);
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.status-dot {
+  width: 6px; height: 6px;
+  background: var(--green);
+  border-radius: 50%;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,100%{opacity:1;transform:scale(1);}
+  50%{opacity:0.4;transform:scale(0.7);}
+}
+
+.mock-msg {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  animation: fadeUp 0.4s ease both;
+}
+
+.mock-msg.user { flex-direction: row-reverse; }
+
+@keyframes fadeUp {
+  from{opacity:0;transform:translateY(6px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+.mock-avatar {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.mock-msg.user .mock-avatar {
+  background: var(--accent);
+  border-color: var(--accent);
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-size: 11px;
+  color: #fff;
+}
+
+.mock-bubble {
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 12px;
+  line-height: 1.6;
+  max-width: 240px;
+}
+
+.mock-msg.ai .mock-bubble {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--ink);
+  border-top-left-radius: 3px;
+}
+
+.mock-msg.user .mock-bubble {
+  background: var(--accent);
+  color: #fff;
+  border-top-right-radius: 3px;
+}
+
+.mock-bubble strong { font-weight: 600; }
+
+.mockup-input {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.mockup-input-field {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-family: 'Lora', serif;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.mockup-send {
+  background: var(--dark);
+  color: var(--accent);
+  border: none;
+  border-radius: 8px;
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* ─── STATS ─── */
+.stats-bar {
+  position: relative;
+  z-index: 1;
+  background: var(--dark);
+  padding: 28px 48px;
+  display: flex;
+  justify-content: center;
+  gap: 64px;
+  flex-wrap: wrap;
+}
+
+.stat-item { text-align: center; }
+.stat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--accent);
+  letter-spacing: -1px;
+}
+.stat-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: rgba(232,223,200,0.4);
+  margin-top: 4px;
+}
+
+/* ─── MODULES ─── */
+.section {
+  position: relative;
+  z-index: 1;
+  padding: 96px 48px;
+}
+
+.section-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(32px, 4vw, 48px);
+  font-weight: 900;
+  color: var(--dark);
+  line-height: 1.15;
+  letter-spacing: -1.5px;
+  margin-bottom: 16px;
+}
+
+.section-sub {
+  font-size: 16px;
+  color: var(--muted);
+  line-height: 1.7;
+  max-width: 480px;
+  margin-bottom: 56px;
+}
+
+.modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.module-card {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.module-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.module-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(26,21,8,0.1);
+}
+
+.module-card:hover::before { opacity: 1; }
+.module-card.green::before { background: var(--green); }
+.module-card.amber::before { background: var(--amber); }
+
+.module-icon { font-size: 40px; margin-bottom: 20px; }
+
+.module-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: 10px;
+}
+
+.module-desc {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+
+.module-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mtag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+
+/* ─── HOW IT WORKS ─── */
+.how-section {
+  position: relative;
+  z-index: 1;
+  background: var(--dark);
+  padding: 96px 48px;
+  overflow: hidden;
+}
+
+.how-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 60% at 80% 50%, rgba(200,146,42,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.how-section .section-eyebrow { color: rgba(200,146,42,0.6); }
+.how-section .section-title { color: #e8dfc8; }
+.how-section .section-sub { color: rgba(232,223,200,0.45); }
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 2px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.step-card {
+  background: rgba(26,21,8,0.6);
+  padding: 36px 28px;
+  position: relative;
+  transition: background 0.2s;
+}
+
+.step-card:hover { background: rgba(200,146,42,0.08); }
+
+.step-number {
+  font-family: 'Playfair Display', serif;
+  font-size: 56px;
+  font-weight: 900;
+  color: rgba(200,146,42,0.15);
+  line-height: 1;
+  margin-bottom: 16px;
+  letter-spacing: -2px;
+}
+
+.step-icon { font-size: 28px; margin-bottom: 14px; }
+
+.step-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #e8dfc8;
+  margin-bottom: 10px;
+}
+
+.step-desc {
+  font-size: 13px;
+  color: rgba(232,223,200,0.45);
+  line-height: 1.7;
+}
+
+/* ─── LANGUAGES ─── */
+.lang-section {
+  position: relative;
+  z-index: 1;
+  padding: 96px 48px;
+  text-align: center;
+}
+
+.lang-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  max-width: 700px;
+  margin: 48px auto 0;
+}
+
+.lang-card {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px 28px;
+  transition: all 0.2s;
+  cursor: default;
+}
+
+.lang-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(200,146,42,0.1);
+}
+
+.lang-flag { font-size: 32px; margin-bottom: 8px; }
+.lang-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: 2px;
+}
+.lang-native {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+
+/* ─── FORMATS ─── */
+.formats-section {
+  position: relative;
+  z-index: 1;
+  background: var(--surface);
+  padding: 96px 48px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.formats-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 48px;
+}
+
+.format-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  padding: 12px 20px;
+  transition: all 0.2s;
+}
+
+.format-pill:hover {
+  border-color: var(--accent);
+  box-shadow: 0 4px 16px rgba(200,146,42,0.1);
+}
+
+.format-icon { font-size: 22px; }
+.format-name {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: var(--ink);
+}
+.format-desc { font-size: 12px; color: var(--muted); }
+
+/* ─── TESTIMONIALS ─── */
+.testimonials {
+  position: relative;
+  z-index: 1;
+  padding: 96px 48px;
+}
+
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-top: 56px;
+}
+
+.testimonial-card {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+}
+
+.testimonial-quote {
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--ink);
+  margin-bottom: 20px;
+  font-style: italic;
+}
+
+.testimonial-quote::before { content: '"'; color: var(--accent); font-size: 24px; }
+
+.testimonial-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.author-avatar {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.author-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--dark);
+}
+
+.author-role {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+/* ─── CTA ─── */
+.cta-section {
+  position: relative;
+  z-index: 1;
+  background: var(--dark);
+  padding: 96px 48px;
+  text-align: center;
+  overflow: hidden;
+}
+
+.cta-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 50% 80% at 50% 50%, rgba(200,146,42,0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.cta-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(36px, 5vw, 60px);
+  font-weight: 900;
+  color: #e8dfc8;
+  line-height: 1.15;
+  letter-spacing: -2px;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.cta-title em { color: var(--accent); font-style: italic; }
+
+.cta-sub {
+  font-size: 16px;
+  color: rgba(232,223,200,0.5);
+  margin-bottom: 40px;
+  position: relative;
+  z-index: 1;
+}
+
+.cta-actions {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+
+.btn-light {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 2px;
+  padding: 16px 32px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: all 0.2s;
+  border: 2px solid var(--accent);
+}
+.btn-light:hover {
+  background: #e0a030;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(200,146,42,0.3);
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  color: rgba(232,223,200,0.6);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 2px;
+  padding: 16px 32px;
+  border-radius: 10px;
+  text-decoration: none;
+  border: 2px solid rgba(255,255,255,0.1);
+  transition: all 0.2s;
+}
+.btn-ghost:hover { border-color: rgba(200,146,42,0.4); color: var(--accent); }
+
+/* ─── FOOTER ─── */
+footer {
+  position: relative;
+  z-index: 1;
+  background: var(--dark);
+  border-top: 1px solid rgba(255,255,255,0.05);
+  padding: 40px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.footer-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 900;
+  color: rgba(232,223,200,0.4);
+  text-decoration: none;
+  letter-spacing: -1px;
+}
+.footer-logo span { color: var(--accent); }
+
+.footer-copy {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: rgba(232,223,200,0.2);
+}
+
+.footer-flags { font-size: 16px; opacity: 0.4; letter-spacing: 4px; }
+
+/* ─── ANIMATIONS ─── */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+
+/* ─── MOBILE ─── */
+@media (max-width: 900px) {
+  nav { padding: 16px 24px; }
+  .nav-links { display: none; }
+  .hero { padding: 100px 24px 60px; flex-direction: column; }
+  .hero-visual { position: static; width: 100%; padding: 40px 0 0; transform: none; }
+  .chat-mockup { margin: 0 auto; }
+  .stats-bar { gap: 32px; padding: 28px 24px; }
+  .section, .how-section, .lang-section, .formats-section, .testimonials, .cta-section { padding: 64px 24px; }
+  footer { padding: 32px 24px; }
+  .hero-bg-text { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">Dost<span>.</span>AI</a>
+  <ul class="nav-links">
+    <li><a href="#modules" data-en="Modules" data-ru="Модули">Modules</a></li>
+    <li><a href="#how" data-en="How it works" data-ru="Как работает">How it works</a></li>
+    <li><a href="#languages" data-en="Languages" data-ru="Языки">Languages</a></li>
+    <li><a href="/app" class="nav-cta" data-en="TRY FREE →" data-ru="ПОПРОБОВАТЬ →">TRY FREE →</a></li>
+  </ul>
+  <div class="lang-switch">
+    <button class="lang-btn active" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" onclick="setLang('ru')">RU</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-text">DOST</div>
+
+  <div class="hero-content">
+    <div class="hero-eyebrow">
+      <span class="hero-tag" data-en="AI LEGAL & LIFE ASSISTANT" data-ru="AI ПОМОЩНИК ДЛЯ ЖИЗНИ">AI LEGAL & LIFE ASSISTANT</span>
+      <div class="hero-flags">🇰🇿🇺🇿🇷🇺🇹🇷🇬🇧</div>
+    </div>
+
+    <h1 data-en="Your <em>friend</em><br>in any situation" data-ru="Твой <em>друг</em><br>в любой ситуации">
+      Your <em>friend</em><br>in any situation
+    </h1>
+
+    <p class="hero-sub" data-en="Know your rights. Draft documents. Understand your pension benefits. Upload any file and get instant, clear answers — in your language." data-ru="Знайте свои права. Составляйте документы. Разберитесь с пенсией. Загрузите любой файл и получите мгновенный ответ — на вашем языке.">
+      Know your rights. Draft documents. Understand your pension benefits. Upload any file and get instant, clear answers — in your language.
+    </p>
+
+    <div class="hero-actions">
+      <a href="/app" class="btn-primary" data-en="START FOR FREE →" data-ru="НАЧАТЬ БЕСПЛАТНО →">START FOR FREE →</a>
+      <a href="#modules" class="btn-secondary" data-en="SEE WHAT I CAN DO" data-ru="ЧТО Я УМЕЮ">SEE WHAT I CAN DO</a>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="chat-mockup">
+      <div class="mockup-header">
+        <span style="font-size:18px">⚖️</span>
+        <div class="mockup-logo">Dost<span>.</span>AI</div>
+        <div class="mockup-status">
+          <div class="status-dot"></div>
+          ONLINE
+        </div>
+      </div>
+
+      <div class="mock-msg user" style="animation-delay:0.2s">
+        <div class="mock-avatar">D</div>
+        <div class="mock-bubble">I got a fine for my car but I was abroad. What can I do?</div>
+      </div>
+
+      <div class="mock-msg ai" style="animation-delay:0.5s">
+        <div class="mock-avatar">⚖️</div>
+        <div class="mock-bubble">
+          Good news — you can appeal this! Since you were abroad, you have <strong>valid grounds</strong>. Here's what to do:<br><br>
+          1️⃣ Gather proof of your trip (passport stamps, tickets)<br>
+          2️⃣ File an appeal within <strong>10 days</strong><br>
+          3️⃣ I'll draft the appeal letter for you ✓
+        </div>
+      </div>
+
+      <div class="mock-msg user" style="animation-delay:0.8s">
+        <div class="mock-avatar">D</div>
+        <div class="mock-bubble">📄 fine_notice.pdf</div>
+      </div>
+
+      <div class="mock-msg ai" style="animation-delay:1.1s">
+        <div class="mock-avatar">⚖️</div>
+        <div class="mock-bubble">I read your document. The fine is from <strong>March 12</strong> — you have <strong>7 days left</strong> to appeal. Let me write the letter now...</div>
+      </div>
+
+      <div class="mockup-input">
+        <div class="mockup-input-field">Ask anything...</div>
+        <div class="mockup-send">↑</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat-item reveal">
+    <div class="stat-num">7+</div>
+    <div class="stat-label" data-en="LANGUAGES" data-ru="ЯЗЫКОВ">LANGUAGES</div>
+  </div>
+  <div class="stat-item reveal reveal-delay-1">
+    <div class="stat-num">6</div>
+    <div class="stat-label" data-en="FILE FORMATS" data-ru="ФОРМАТОВ ФАЙЛОВ">FILE FORMATS</div>
+  </div>
+  <div class="stat-item reveal reveal-delay-2">
+    <div class="stat-num">3</div>
+    <div class="stat-label" data-en="MODULES" data-ru="МОДУЛЯ">MODULES</div>
+  </div>
+  <div class="stat-item reveal reveal-delay-3">
+    <div class="stat-num">24/7</div>
+    <div class="stat-label" data-en="ALWAYS AVAILABLE" data-ru="ВСЕГДА ДОСТУПЕН">ALWAYS AVAILABLE</div>
+  </div>
+  <div class="stat-item reveal reveal-delay-4">
+    <div class="stat-num">FREE</div>
+    <div class="stat-label" data-en="TO START" data-ru="ДЛЯ СТАРТА">TO START</div>
+  </div>
+</div>
+
+<!-- MODULES -->
+<section class="section" id="modules">
+  <div class="section-eyebrow" data-en="WHAT DOST CAN DO" data-ru="ЧТО УМЕЕТ DOST">WHAT DOST CAN DO</div>
+  <h2 class="section-title reveal" data-en="Three modules.<br>One friend." data-ru="Три модуля.<br>Один друг.">Three modules.<br>One friend.</h2>
+  <p class="section-sub reveal" data-en="Everything you need to navigate everyday bureaucracy — rights, documents, and social benefits." data-ru="Всё что нужно для повседневных бюрократических задач — права, документы и социальные льготы.">Everything you need to navigate everyday bureaucracy — rights, documents, and social benefits.</p>
+
+  <div class="modules-grid">
+    <div class="module-card reveal">
+      <div class="module-icon">⚖️</div>
+      <div class="module-name" data-en="My Rights" data-ru="Мои права">My Rights</div>
+      <div class="module-desc" data-en="Got a fine? Employer not paying? Conflict with a shop or landlord? I explain your rights clearly and tell you exactly what to do next." data-ru="Штраф? Работодатель не платит? Конфликт с магазином или арендодателем? Объясню ваши права и скажу что делать дальше.">Got a fine? Employer not paying? Conflict with a shop or landlord? I explain your rights clearly and tell you exactly what to do next.</div>
+      <div class="module-tags">
+        <span class="mtag">FINES</span>
+        <span class="mtag">LABOR</span>
+        <span class="mtag">CONSUMER</span>
+        <span class="mtag">RENTAL</span>
+        <span class="mtag">BANKING</span>
+      </div>
+    </div>
+
+    <div class="module-card green reveal reveal-delay-1">
+      <div class="module-icon">📋</div>
+      <div class="module-name" data-en="Documents" data-ru="Документы">Documents</div>
+      <div class="module-desc" data-en="Upload a document and I'll explain it in plain language. Or tell me your situation and I'll draft the complaint, application, or letter — ready to send." data-ru="Загрузите документ — объясню что в нём написано. Или опишите ситуацию — составлю жалобу, заявление или письмо готовое к отправке.">Upload a document and I'll explain it in plain language. Or tell me your situation and I'll draft the complaint, application, or letter — ready to send.</div>
+      <div class="module-tags">
+        <span class="mtag">COMPLAINTS</span>
+        <span class="mtag">APPLICATIONS</span>
+        <span class="mtag">APOSTILLE</span>
+        <span class="mtag">CONTRACTS</span>
+      </div>
+    </div>
+
+    <div class="module-card amber reveal reveal-delay-2">
+      <div class="module-icon">👴</div>
+      <div class="module-name" data-en="Pension & Benefits" data-ru="Пенсия и льготы">Pension & Benefits</div>
+      <div class="module-desc" data-en="Confused about your pension? I'll explain ENPF, calculate your entitlements, and tell you every benefit you qualify for — no queues, no confusion." data-ru="Запутались в пенсии? Объясню ЕНПФ, рассчитаю что вам положено и расскажу о всех льготах — без очередей и путаницы.">Confused about your pension? I'll explain ENPF, calculate your entitlements, and tell you every benefit you qualify for — no queues, no confusion.</div>
+      <div class="module-tags">
+        <span class="mtag">ENPF</span>
+        <span class="mtag">BENEFITS</span>
+        <span class="mtag">ALLOWANCES</span>
+        <span class="mtag">RETIREMENT</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section" id="how">
+  <div class="section-eyebrow" data-en="HOW IT WORKS" data-ru="КАК ЭТО РАБОТАЕТ">HOW IT WORKS</div>
+  <h2 class="section-title reveal" data-en="Simple as texting<br>a friend." data-ru="Просто как написать<br>другу.">Simple as texting<br>a friend.</h2>
+  <p class="section-sub reveal" data-en="No forms. No waiting rooms. No confusing legal jargon." data-ru="Никаких форм. Никаких очередей. Никакого юридического жаргона.">No forms. No waiting rooms. No confusing legal jargon.</p>
+
+  <div class="steps-grid">
+    <div class="step-card reveal">
+      <div class="step-number">01</div>
+      <div class="step-icon">💬</div>
+      <div class="step-title" data-en="Describe your situation" data-ru="Опишите ситуацию">Describe your situation</div>
+      <div class="step-desc" data-en="Write in any language. Dost understands Russian, English, Kazakh, Uzbek, Turkish and more." data-ru="Пишите на любом языке. Dost понимает русский, английский, казахский, узбекский, турецкий и другие.">Write in any language. Dost understands Russian, English, Kazakh, Uzbek, Turkish and more.</div>
+    </div>
+
+    <div class="step-card reveal reveal-delay-1">
+      <div class="step-number">02</div>
+      <div class="step-icon">📎</div>
+      <div class="step-title" data-en="Upload your document" data-ru="Загрузите документ">Upload your document</div>
+      <div class="step-desc" data-en="PDF, photo, Word, Excel — just attach it. Dost reads and understands any file format." data-ru="PDF, фото, Word, Excel — просто прикрепите. Dost читает и понимает любой формат файла.">PDF, photo, Word, Excel — just attach it. Dost reads and understands any file format.</div>
+    </div>
+
+    <div class="step-card reveal reveal-delay-2">
+      <div class="step-number">03</div>
+      <div class="step-icon">⚡</div>
+      <div class="step-title" data-en="Get a clear answer" data-ru="Получите чёткий ответ">Get a clear answer</div>
+      <div class="step-desc" data-en="No jargon. Step-by-step instructions. Deadlines highlighted. Ready-to-use documents." data-ru="Никакого жаргона. Пошаговые инструкции. Выделенные дедлайны. Готовые документы.">No jargon. Step-by-step instructions. Deadlines highlighted. Ready-to-use documents.</div>
+    </div>
+
+    <div class="step-card reveal reveal-delay-3">
+      <div class="step-number">04</div>
+      <div class="step-icon">✅</div>
+      <div class="step-title" data-en="Take action with confidence" data-ru="Действуйте уверенно">Take action with confidence</div>
+      <div class="step-desc" data-en="Copy the letter, know your rights, meet the deadline. Dost stays with you throughout the process." data-ru="Скопируйте письмо, знайте свои права, соблюдайте срок. Dost остаётся с вами на протяжении всего процесса.">Copy the letter, know your rights, meet the deadline. Dost stays with you throughout the process.</div>
+    </div>
+  </div>
+</section>
+
+<!-- LANGUAGES -->
+<section class="lang-section" id="languages">
+  <div class="section-eyebrow" data-en="SPEAKS YOUR LANGUAGE" data-ru="ГОВОРИТ НА ВАШЕМ ЯЗЫКЕ">SPEAKS YOUR LANGUAGE</div>
+  <h2 class="section-title reveal" data-en="Built for <em>Central Asia</em>,<br>open to the world." data-ru="Создан для <em>Центральной Азии</em>,<br>открыт для всего мира.">Built for <em>Central Asia</em>,<br>open to the world.</h2>
+  <p class="section-sub reveal" style="margin:0 auto 0" data-en="Write in any language and Dost responds in the same language. No switching, no barriers." data-ru="Пишите на любом языке и Dost отвечает на том же языке. Никаких переключений, никаких барьеров.">Write in any language and Dost responds in the same language. No switching, no barriers.</p>
+
+  <div class="lang-grid">
+    <div class="lang-card reveal">
+      <div class="lang-flag">🇰🇿</div>
+      <div class="lang-name">Kazakhstan</div>
+      <div class="lang-native">Қазақша · Русский</div>
+    </div>
+    <div class="lang-card reveal reveal-delay-1">
+      <div class="lang-flag">🇺🇿</div>
+      <div class="lang-name">Uzbekistan</div>
+      <div class="lang-native">O'zbek · Русский</div>
+    </div>
+    <div class="lang-card reveal reveal-delay-2">
+      <div class="lang-flag">🇷🇺</div>
+      <div class="lang-name">Russia</div>
+      <div class="lang-native">Русский</div>
+    </div>
+    <div class="lang-card reveal reveal-delay-3">
+      <div class="lang-flag">🇹🇷</div>
+      <div class="lang-name">Turkey</div>
+      <div class="lang-native">Türkçe</div>
+    </div>
+    <div class="lang-card reveal reveal-delay-4">
+      <div class="lang-flag">🇰🇬</div>
+      <div class="lang-name">Kyrgyzstan</div>
+      <div class="lang-native">Кыргызча · Русский</div>
+    </div>
+    <div class="lang-card reveal">
+      <div class="lang-flag">🇦🇿</div>
+      <div class="lang-name">Azerbaijan</div>
+      <div class="lang-native">Azərbaycan</div>
+    </div>
+    <div class="lang-card reveal reveal-delay-1">
+      <div class="lang-flag">🇬🇧</div>
+      <div class="lang-name">English</div>
+      <div class="lang-native">English</div>
+    </div>
+  </div>
+</section>
+
+<!-- FILE FORMATS -->
+<section class="formats-section">
+  <div class="section-eyebrow" data-en="UPLOAD ANYTHING" data-ru="ЗАГРУЖАЙТЕ ЧТО УГОДНО">UPLOAD ANYTHING</div>
+  <h2 class="section-title reveal" data-en="Any document.<br>Any format." data-ru="Любой документ.<br>Любой формат.">Any document.<br>Any format.</h2>
+
+  <div class="formats-grid">
+    <div class="format-pill reveal">
+      <span class="format-icon">📄</span>
+      <div>
+        <div class="format-name">PDF</div>
+        <div class="format-desc" data-en="Contracts, fines, letters" data-ru="Договора, штрафы, письма">Contracts, fines, letters</div>
+      </div>
+    </div>
+    <div class="format-pill reveal reveal-delay-1">
+      <span class="format-icon">🖼️</span>
+      <div>
+        <div class="format-name">JPG · PNG · WEBP</div>
+        <div class="format-desc" data-en="Photo of any document" data-ru="Фото любого документа">Photo of any document</div>
+      </div>
+    </div>
+    <div class="format-pill reveal reveal-delay-2">
+      <span class="format-icon">📝</span>
+      <div>
+        <div class="format-name">Word .docx</div>
+        <div class="format-desc" data-en="Employment contracts, agreements" data-ru="Трудовые договора, соглашения">Employment contracts, agreements</div>
+      </div>
+    </div>
+    <div class="format-pill reveal reveal-delay-3">
+      <span class="format-icon">📊</span>
+      <div>
+        <div class="format-name">Excel .xlsx</div>
+        <div class="format-desc" data-en="Bank statements, payslips" data-ru="Банковские выписки, расчётные листы">Bank statements, payslips</div>
+      </div>
+    </div>
+    <div class="format-pill reveal reveal-delay-4">
+      <span class="format-icon">📑</span>
+      <div>
+        <div class="format-name">PowerPoint .pptx</div>
+        <div class="format-desc" data-en="Presentations, proposals" data-ru="Презентации, предложения">Presentations, proposals</div>
+      </div>
+    </div>
+    <div class="format-pill reveal">
+      <span class="format-icon">📃</span>
+      <div>
+        <div class="format-name">TXT</div>
+        <div class="format-desc" data-en="Plain text documents" data-ru="Простые текстовые файлы">Plain text documents</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials">
+  <div class="section-eyebrow" data-en="REAL PEOPLE · REAL SITUATIONS" data-ru="РЕАЛЬНЫЕ ЛЮДИ · РЕАЛЬНЫЕ СИТУАЦИИ">REAL PEOPLE · REAL SITUATIONS</div>
+  <h2 class="section-title reveal" data-en="People like you<br>already use Dost." data-ru="Такие же люди<br>уже используют Dost.">People like you<br>already use Dost.</h2>
+
+  <div class="testimonials-grid">
+    <div class="testimonial-card reveal">
+      <div class="testimonial-quote" data-en="I uploaded my fine notice and Dost told me exactly how to appeal it. I saved 15,000 tenge and the whole thing took 10 minutes." data-ru="Загрузил уведомление о штрафе и Dost рассказал как его оспорить. Сэкономил 15 000 тенге, всё заняло 10 минут.">I uploaded my fine notice and Dost told me exactly how to appeal it. I saved 15,000 tenge and the whole thing took 10 minutes.</div>
+      <div class="testimonial-author">
+        <div class="author-avatar">👨</div>
+        <div>
+          <div class="author-name">Arman K.</div>
+          <div class="author-role">ALMATY, KAZAKHSTAN 🇰🇿</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="testimonial-card reveal reveal-delay-1">
+      <div class="testimonial-quote" data-en="As a student abroad, I needed apostille documents but had no idea where to start. Dost gave me a clear step-by-step plan in English." data-ru="Как студент за рубежом мне нужны были документы с апостилем, но я понятия не имела с чего начать. Dost дал чёткий пошаговый план на русском.">As a student abroad, I needed apostille documents but had no idea where to start. Dost gave me a clear step-by-step plan in English.</div>
+      <div class="testimonial-author">
+        <div class="author-avatar">👩</div>
+        <div>
+          <div class="author-name">Dilnoza M.</div>
+          <div class="author-role">TASHKENT, UZBEKISTAN 🇺🇿</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="testimonial-card reveal reveal-delay-2">
+      <div class="testimonial-quote" data-en="My employer hadn't paid me for 3 weeks. Dost explained my rights and drafted a formal letter. I got paid the next day." data-ru="Работодатель не платил мне 3 недели. Dost объяснил мои права и составил официальное письмо. Деньги пришли на следующий день.">My employer hadn't paid me for 3 weeks. Dost explained my rights and drafted a formal letter. I got paid the next day.</div>
+      <div class="testimonial-author">
+        <div class="author-avatar">👨</div>
+        <div>
+          <div class="author-name">Mehmet Y.</div>
+          <div class="author-role">ISTANBUL, TURKEY 🇹🇷</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2 class="cta-title" data-en="Your friend is<br><em>waiting for you.</em>" data-ru="Твой друг<br><em>уже ждёт тебя.</em>">Your friend is<br><em>waiting for you.</em></h2>
+  <p class="cta-sub" data-en="Free to use. No registration. Works in any language. Available 24/7." data-ru="Бесплатно. Без регистрации. Работает на любом языке. Доступен 24/7.">Free to use. No registration. Works in any language. Available 24/7.</p>
+  <div class="cta-actions">
+    <a href="/app" class="btn-light" data-en="OPEN DOST.AI →" data-ru="ОТКРЫТЬ DOST.AI →">OPEN DOST.AI →</a>
+    <a href="#modules" class="btn-ghost" data-en="LEARN MORE" data-ru="УЗНАТЬ БОЛЬШЕ">LEARN MORE</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a href="#" class="footer-logo">Dost<span>.</span>AI</a>
+  <div class="footer-copy" data-en="© 2025 Dost.AI — Your friend in any situation" data-ru="© 2025 Dost.AI — Твой друг в любой ситуации">© 2025 Dost.AI — Your friend in any situation</div>
+  <div class="footer-flags">🇰🇿🇺🇿🇷🇺🇹🇷🇰🇬🇦🇿🇬🇧</div>
+</footer>
+
+<script>
+// ── Language switch ──
+let currentLang = 'en';
+
+function setLang(lang) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent === lang.toUpperCase());
+  });
+  document.querySelectorAll('[data-en]').forEach(el => {
+    const text = el.getAttribute('data-' + lang);
+    if (!text) return;
+    if (el.tagName === 'H1' || el.tagName === 'H2') {
+      el.innerHTML = text;
+    } else {
+      el.textContent = text;
+    }
+  });
+}
+
+// ── Scroll reveal ──
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ── Smooth nav links ──
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+});
+</script>
+</body>
+</html>
