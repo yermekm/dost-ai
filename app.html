@@ -1250,16 +1250,15 @@ function loadChat(index) {
 // ══════════════════════════════════════════
 const SUPABASE_URL = 'https://qepnxzgwggovmeqdapgw.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_lkwXPgKj0ztFR3n-UmiVbw_SYLJJegM';
-const { createClient } = window.supabase;
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Check session on load
-supabase.auth.getSession().then(({ data: { session } }) => {
+_supabase.auth.getSession().then(({ data: { session } }) => {
   if (session?.user) onUserLoggedIn(session.user);
 });
 
 // Listen for auth state changes
-supabase.auth.onAuthStateChange((event, session) => {
+_supabase.auth.onAuthStateChange((event, session) => {
   if (event === 'SIGNED_IN' && session?.user) {
     onUserLoggedIn(session.user);
     closeAuth();
@@ -1273,7 +1272,7 @@ function onUserLoggedIn(user) {
   const loginBtn = document.getElementById('loginBtn');
   loginBtn.textContent = name;
   loginBtn.onclick = async () => {
-    await supabase.auth.signOut();
+    await _supabase.auth.signOut();
   };
   document.getElementById('registerBtn').style.display = 'none';
 }
@@ -1325,7 +1324,7 @@ function showAuthError(msg) {
 }
 
 async function authWithGoogle() {
-  const { error } = await supabase.auth.signInWithOAuth({
+  const { error } = await _supabase.auth.signInWithOAuth({
     provider: 'google',
     options: { redirectTo: window.location.origin + window.location.pathname }
   });
@@ -1348,9 +1347,9 @@ async function authWithEmail(type) {
 
   let result;
   if (type === 'login') {
-    result = await supabase.auth.signInWithPassword({ email, password: pass });
+    result = await _supabase.auth.signInWithPassword({ email, password: pass });
   } else {
-    result = await supabase.auth.signUp({ email, password: pass });
+    result = await _supabase.auth.signUp({ email, password: pass });
     if (!result.error) {
       btn.textContent = origText;
       btn.disabled = false;
