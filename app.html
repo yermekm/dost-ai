@@ -12,6 +12,7 @@
 <title>Dost AI — Your friend in any situation</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=IBM+Plex+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -209,7 +210,7 @@ header {
   height:calc(100vh - 111px);
 }
 
-.chat-panel { display:flex; flex-direction:column; height:100%; }
+.chat-panel { display:flex; flex-direction:column-reverse; height:100%; }
 
 /* ─── CHAT MESSAGES ─── */
 .chat-messages {
@@ -220,6 +221,7 @@ header {
   flex-direction:column;
   gap:22px;
   background:var(--bg);
+  justify-content:flex-start;
 }
 .chat-messages::-webkit-scrollbar { width:4px; }
 .chat-messages::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
@@ -367,7 +369,7 @@ header {
 /* ─── INPUT AREA ─── */
 .input-area {
   padding:12px 28px 18px;
-  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
   background:var(--paper);
 }
 
@@ -1223,15 +1225,55 @@ function loadChat(index) {
 }
 
 // ══════════════════════════════════════════
-// AUTH MODAL
 // ══════════════════════════════════════════
+// SUPABASE AUTH
+// ══════════════════════════════════════════
+const SUPABASE_URL = 'https://qepnxzgwggovmeqdapgw.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_lkwXPgKj0ztFR3n-UmiVbw_SYLJJegM';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// Check session on load
+supabase.auth.getSession().then(({ data: { session } }) => {
+  if (session?.user) onUserLoggedIn(session.user);
+});
+
+// Listen for auth state changes
+supabase.auth.onAuthStateChange((event, session) => {
+  if (event === 'SIGNED_IN' && session?.user) {
+    onUserLoggedIn(session.user);
+    closeAuth();
+  }
+  if (event === 'SIGNED_OUT') onUserLoggedOut();
+});
+
+function onUserLoggedIn(user) {
+  currentUser = user;
+  const name = user.user_metadata?.full_name || user.email.split('@')[0];
+  const loginBtn = document.getElementById('loginBtn');
+  loginBtn.textContent = name;
+  loginBtn.onclick = async () => {
+    await supabase.auth.signOut();
+  };
+  document.getElementById('registerBtn').style.display = 'none';
+}
+
+function onUserLoggedOut() {
+  currentUser = null;
+  const loginBtn = document.getElementById('loginBtn');
+  loginBtn.textContent = UI_LANGS[uiLang]?.login || 'Войти';
+  loginBtn.onclick = () => openAuth('login');
+  document.getElementById('registerBtn').style.display = '';
+}
+
 function openAuth(tab) {
   document.getElementById('authModal').classList.add('open');
-  switchAuthTab(tab);
+  switchAuthTab(tab || 'login');
 }
 
 function closeAuth() {
   document.getElementById('authModal').classList.remove('open');
+  const el = document.getElementById('authError');
+  if (el) el.remove();
 }
 
 function switchAuthTab(tab) {
@@ -1239,27 +1281,74 @@ function switchAuthTab(tab) {
   document.getElementById('formRegister').style.display = tab === 'register' ? 'flex' : 'none';
   document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
   document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+  const el = document.getElementById('authError');
+  if (el) el.remove();
 }
 
-// Close modal on overlay click
 document.getElementById('authModal').addEventListener('click', function(e) {
   if (e.target === this) closeAuth();
 });
 
-function authWithGoogle() {
-  // Placeholder — integrate with your auth provider
-  alert('Google auth — подключите Firebase или Auth0');
+function showAuthError(msg) {
+  let el = document.getElementById('authError');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'authError';
+    el.style.cssText = 'color:#c0392b;font-size:12px;text-align:center;padding:8px 12px;background:rgba(192,57,43,0.08);border-radius:8px;font-family:"IBM Plex Mono",monospace;';
+    const activeForm = document.getElementById('formLogin').style.display !== 'none'
+      ? document.getElementById('formLogin')
+      : document.getElementById('formRegister');
+    activeForm.appendChild(el);
+  }
+  el.textContent = msg;
 }
 
-function authWithEmail(type) {
-  const email = document.getElementById(type === 'login' ? 'loginEmail' : 'regEmail').value;
+async function authWithGoogle() {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin + window.location.pathname }
+  });
+  if (error) showAuthError(error.message);
+}
+
+async function authWithEmail(type) {
+  const email = document.getElementById(type === 'login' ? 'loginEmail' : 'regEmail').value.trim();
   const pass = document.getElementById(type === 'login' ? 'loginPassword' : 'regPassword').value;
-  if (!email || !pass) return alert('Заполните все поля');
-  // Placeholder — integrate with your auth provider
-  currentUser = { email };
-  closeAuth();
-  document.getElementById('loginBtn').textContent = email.split('@')[0];
-  document.getElementById('registerBtn').style.display = 'none';
+
+  if (!email || !pass) return showAuthError('Заполните все поля');
+  if (pass.length < 6) return showAuthError('Пароль минимум 6 символов');
+
+  const btn = document.querySelector(
+    `#form${type === 'login' ? 'Login' : 'Register'} .btn-submit`
+  );
+  const origText = btn.textContent;
+  btn.textContent = '...';
+  btn.disabled = true;
+
+  let result;
+  if (type === 'login') {
+    result = await supabase.auth.signInWithPassword({ email, password: pass });
+  } else {
+    result = await supabase.auth.signUp({ email, password: pass });
+    if (!result.error) {
+      btn.textContent = origText;
+      btn.disabled = false;
+      showAuthError('✓ Аккаунт создан! Войдите с вашим email и паролем.');
+      switchAuthTab('login');
+      return;
+    }
+  }
+
+  btn.textContent = origText;
+  btn.disabled = false;
+
+  if (result.error) {
+    const msg = result.error.message.includes('Invalid login credentials') ? 'Неверный email или пароль'
+      : result.error.message.includes('already registered') ? 'Email уже зарегистрирован'
+      : result.error.message.includes('Email not confirmed') ? 'Подтвердите email'
+      : result.error.message;
+    showAuthError(msg);
+  }
 }
 
 // ══════════════════════════════════════════
