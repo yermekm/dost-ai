@@ -52,7 +52,7 @@ body::before {
   z-index:0;
 }
 
-.app { position:relative; z-index:1; display:flex; flex-direction:column; min-height:100vh; }
+.app { position:relative; z-index:1; display:flex; flex-direction:column; height:100vh; overflow:hidden; }
 
 /* ─── HEADER ─── */
 header {
@@ -209,7 +209,9 @@ header {
 .content {
   display:flex;
   flex-direction:column;
-  height:calc(100vh - 111px);
+  flex:1;
+  min-height:0;
+  overflow:hidden;
 }
 
 .chat-panel { display:flex; flex-direction:column; height:100%; }
@@ -223,7 +225,7 @@ header {
   flex-direction:column;
   gap:22px;
   background:var(--bg);
-  justify-content:flex-start;
+  min-height:0;
 }
 .chat-messages::-webkit-scrollbar { width:4px; }
 .chat-messages::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
@@ -655,7 +657,7 @@ header {
   .module-tabs { padding:0 8px; }
   .tab { padding:12px 14px; font-size:13px; gap:6px; }
   .tab-icon { font-size:20px; }
-  .content { height:calc(100vh - 108px); }
+  .content { height:auto; flex:1; min-height:0; }
   .chat-messages { padding:16px 12px; gap:16px; }
   .welcome { padding:24px 12px; }
   .welcome-emoji { font-size:44px; }
@@ -782,6 +784,20 @@ header {
     <div class="history-title" data-i="historyTitle">ИСТОРИЯ ЧАТОВ</div>
     <div id="historyContent"></div>
   </div>
+
+  <!-- ─── FOOTER ─── -->
+  <div style="
+    position:fixed; bottom:0; left:0; right:0;
+    text-align:center;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    letter-spacing:1px;
+    color:var(--muted);
+    padding:4px;
+    pointer-events:none;
+    z-index:10;
+    opacity:0.5;
+  ">Created by YM &amp; C</div>
 
 </div>
 
